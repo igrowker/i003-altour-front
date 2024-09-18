@@ -1,9 +1,20 @@
+'use client';
+
 import Link from 'next/link';
 import NavLinks from '@/app/ui/nav-links';
 import { PowerIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import { usePathname } from "next/navigation";
+
 
 export default function SideNav() {
+  const pathname = usePathname()
+  const hideNav = pathname === "/login" || pathname === "/register"
+
+  if (hideNav) {
+    return null;
+  }
+
   return (
     <div className="flex h-full flex-col px-3 py-4 md:px-2">
       <Link
