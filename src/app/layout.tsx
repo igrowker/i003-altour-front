@@ -1,7 +1,7 @@
 import "@/app/globals.css";
 import { inter } from "@/app/ui/fonts";
 import "./globals.css";
-import SideNav from "./ui/sidenav";
+import Navbar from "./ui/navbar";
 import { Providers } from "./Providers";
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <SideNav />
+          <Navbar />
           {children}
         </Providers>
       </body>

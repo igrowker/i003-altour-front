@@ -4,7 +4,7 @@ import NavLinks from "@/app/ui/nav-links";
 import { PowerIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
 
-export default function SideNav() {
+export default function Navbar() {
   const pathname = usePathname();
   const hideNav = pathname === "/login" || pathname === "/register";
 
