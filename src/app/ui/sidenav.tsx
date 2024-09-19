@@ -1,46 +1,27 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import NavLinks from '@/app/ui/nav-links';
-import { PowerIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
+import NavLinks from "@/app/ui/nav-links";
+import { PowerIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
 
-
 export default function SideNav() {
-  const pathname = usePathname()
-  const hideNav = pathname === "/login" || pathname === "/register"
+  const pathname = usePathname();
+  const hideNav = pathname === "/login" || pathname === "/register";
 
   if (hideNav) {
     return null;
   }
 
   return (
-    <div className="flex h-full flex-col px-3 py-4 md:px-2">
-      <Link
-        className="mb-2 flex h-20 items-end justify-start rounded-md bg-blue-600 p-4 md:h-40"
-        href="/"
-      >
-        {/* Añade <AltourLogo /> */}
-        <Image
-          src="/isotipo_altour.png"
-          // className="rounded-full"
-          alt="altour logo"
-          width={60}
-          height={60}
-        />
-
-      </Link>
-      <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+    <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 shadow-md z-10">
+      <div className="flex justify-around items-center py-2 space-x-4">
         <NavLinks />
-        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
-        <form>
-          <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
-            <PowerIcon className="w-6" />
-            <div className="hidden md:block">Sign Out</div>
-          </button>
-        </form>
+{/* //TODO:añadir funcionalidad a "Sign Out" */}
+        <button className="flex flex-col items-center text-gray-600 hover:text-blue-500">
+          <PowerIcon className="w-6 h-6" />
+          <p className="text-xs mt-1">Sign Out</p>
+        </button>
       </div>
-    </div>
+    </nav>
   );
 }

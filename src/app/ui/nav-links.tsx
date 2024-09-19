@@ -1,41 +1,54 @@
+"use client";
+
 import {
-    UserGroupIcon,
-    HomeIcon,
-    UserIcon,
-  } from "@heroicons/react/24/outline";
+  HomeIcon,
+  UserIcon,
+  MapIcon,
+  MagnifyingGlassIcon,
+  HeartIcon,
+  PowerIcon
+} from "@heroicons/react/24/outline";
+
 
 import Link from "next/link";
+import Image from "next/image";
 
+const logo = "/isotipo_altour.png";
 
 const links = [
-  { name: "Home", href: "/", icon: HomeIcon },
-  {
-    name: "Login",
-    href: "/login",
-    icon: UserGroupIcon,
-  },
-  { name: "Register", href: "/register", icon: UserIcon },
+  { name: "Home", href: "/", icon: logo }, // El logo es una imagen
+  { name: "Search", href: "/search", icon: MagnifyingGlassIcon },
+  { name: "Favorites", href: "/favorites", icon: HeartIcon },
+  { name: "Map", href: "/heatmap", icon: MapIcon },
+  { name: "User", href: "/user", icon: UserIcon },
 ];
 
-
-
 export default function NavLinks() {
-    return (
-        <>
-        {links.map((link) => {
-          const LinkIcon = link.icon;
-          return (
-            <Link
-              key={link.name}
-              href={link.href}
-              className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3"
-            >
-              <LinkIcon className="w-6" />
-              <p className="hidden md:block">{link.name}</p>
-            </Link>
-          );
-        })}
-      </>
-    )
-  }
-
+  return (
+    <>
+      {links.map((link) => {
+        return (
+          <Link
+            key={link.name}
+            href={link.href}
+            className="flex flex-col items-center text-gray-600 hover:text-blue-500"
+          >
+            {/* Comprobamos si el icono es una cadena (imagen) o un componente */}
+            {typeof link.icon === "string" ? (
+              <Image
+                src={link.icon}
+                alt={`${link.name} logo`}
+                width={36}
+                height={36}
+                className="w-8 h-8"
+              />
+            ) : (
+              <link.icon className="w-6 h-6" />
+            )}
+             <p className="text-xs mt-1">{link.name}</p>
+          </Link>
+        );
+      })}
+    </>
+  );
+}
