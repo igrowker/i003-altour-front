@@ -7,19 +7,18 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "./button";
 
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, useSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function LoginForm() {
+  //Google Auth
+  const { data: session } = useSession();
+  console.log(session);
 
-//Google Auth
-const {data: session} = useSession()
-console.log(session)
-
-//Credentials Auth
+  //Credentials Auth
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -38,9 +37,9 @@ console.log(session)
       callbackUrl,
     });
 
-	//TODO: borrar clgs cuando funcione correctamente login
-	console.log("credentialsResult", result)
-	console.log(email, password)
+    //TODO: borrar clgs cuando funcione correctamente login
+    console.log("credentialsResult", result);
+    console.log(email, password);
 
     if (result?.error) {
       setError("Invalid email or password");
@@ -104,18 +103,13 @@ console.log(session)
           </div>
 
           <div>
-            <Button
-              type="submit"
-              className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-500"
-            >
-              Iniciar sesión
-            </Button>
+            <Button type="submit">Iniciar sesión</Button>
             <div className="flex items-center justify-center space-x-2 mt-5">
               <p className="text-xs font-medium text-gray-900">
                 ¿No tienes una cuenta?
               </p>
               <Link key="Register" href="/register">
-                <p className="text-xs font-medium text-blue-600 hover:text-blue-800">
+                <p className="text-xs font-medium text-[#FE2A5C] hover:text-blue-800">
                   Regístrate
                 </p>
               </Link>
