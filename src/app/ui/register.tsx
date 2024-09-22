@@ -12,6 +12,7 @@ interface FormData {
   name: string;
   email: string;
   password: string;
+  accept: boolean;
 }
 
 const RegisterForm: React.FC = () => {
@@ -19,6 +20,7 @@ const RegisterForm: React.FC = () => {
     name: "",
     email: "",
     password: "",
+    accept: false, //TODO: para el checkbox
   });
 
   const { name, email, password } = formData;
@@ -41,7 +43,6 @@ const RegisterForm: React.FC = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-  
         <h2 className="text-2xl font-bold mb-6 text-center">
           Crear una cuenta
         </h2>
