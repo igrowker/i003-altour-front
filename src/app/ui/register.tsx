@@ -7,7 +7,7 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
 import { Button } from "./button";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, EyeSlashIcon, KeyIcon } from "@heroicons/react/24/outline";
 import Modal from "./dialog-panel";
 import { validatePass } from "../lib/formValidation";
 
@@ -37,7 +37,7 @@ export default function RegisterForm() {
   const [showTermsModal, setShowTermsModal] = useState(false); // Para términos y condiciones
   const [showWarningModal, setShowWarningModal] = useState(false); // Para advertencia aceptación
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Nuevo estado para confirm password
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
 
   const { name, email, password, confirmPassword, accept } = formData;
 
@@ -90,7 +90,6 @@ export default function RegisterForm() {
     console.log("Registro con Google");
   };
 
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
@@ -120,11 +119,11 @@ export default function RegisterForm() {
               Nombre de usuario
             </label>
             <input
+              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 text-black placeholder:text-gray-500"
               type="text"
               name="name"
               value={name}
               onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Ejemplo: Daniel"
               required
             />
@@ -138,11 +137,11 @@ export default function RegisterForm() {
               Correo electrónico
             </label>
             <input
+              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 text-black placeholder:text-gray-500"
               type="email"
               name="email"
               value={email}
               onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="ejemplo@correo.com"
               required
             />
@@ -155,26 +154,31 @@ export default function RegisterForm() {
             >
               Contraseña
             </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              value={password}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10" // Espacio para el icono
-              placeholder="Escribe una contraseña*"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-3 flex items-center focus:outline-none"
-            >
-              {showPassword ? (
-                <EyeSlashIcon className="h-5 w-5 text-gray-500" />
-              ) : (
-                <EyeIcon className="h-5 w-5 text-gray-500" />
-              )}
-            </button>
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 text-black placeholder:text-gray-500"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={password}
+                onChange={handleInputChange}
+                // className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10" // Espacio para el icono
+                placeholder="Escribe una contraseña*"
+                required
+              />
+              <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-3 flex items-center focus:outline-none"
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="h-5 w-5 text-gray-500" />
+                ) : (
+                  <EyeIcon className="h-5 w-5 text-gray-500" />
+                )}
+              </button>
+            </div>
+
             {error.password && (
               <p className="text-red-500 text-xs italic">{error.password}</p>
             )}
@@ -187,15 +191,18 @@ export default function RegisterForm() {
             >
               Confirmar Contraseña
             </label>
+            <div className="relative">
             <input
+              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 text-black placeholder:text-gray-500"
               type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
               value={confirmPassword}
               onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10" // Espacio para el icono
               placeholder="Confirma tu contraseña*"
               required
             />
+                          <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+
             <button
               type="button"
               onClick={() => setShowConfirmPassword((prev) => !prev)}
@@ -207,6 +214,7 @@ export default function RegisterForm() {
                 <EyeIcon className="h-5 w-5 text-gray-500" />
               )}
             </button>
+            </div>
             {error.confirmPassword && (
               <p className="text-red-500 text-xs italic">
                 {error.confirmPassword}
@@ -281,5 +289,3 @@ export default function RegisterForm() {
     </div>
   );
 }
-
-

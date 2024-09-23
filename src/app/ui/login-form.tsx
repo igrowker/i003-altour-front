@@ -2,12 +2,16 @@
 
 import { useState } from "react";
 import { signIn, useSession } from "next-auth/react";
-import { AtSymbolIcon, KeyIcon } from "@heroicons/react/24/outline";
+import {
+  AtSymbolIcon,
+  KeyIcon,
+  EyeIcon,
+  EyeSlashIcon,
+} from "@heroicons/react/24/outline";
 import { Button } from "./button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { validatePass } from "../lib/formValidation"; // Importa la función de validación
-
 
 // Estado inicial del formulario
 interface FormState {
@@ -35,7 +39,7 @@ export default function LoginForm() {
   const [error, setError] = useState<ErrorState>({});
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
+  const [showPassword, setShowPassword] = useState(false);
 
   // Maneja cambios en los inputs y actualiza el estado
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,20 +47,18 @@ export default function LoginForm() {
     setError({ ...error, [e.target.name]: "" }); // Limpia el error correspondiente
   };
 
- 
   // Función que maneja el envío del formulario
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-   // Usa la función de validación importada
-   const { valid, errors } = validatePass(formState);
-   if (!valid) {
-     setError(errors); // Muestra los errores si los hay
-     return;
-   }
+    // Usa la función de validación importada
+    const { valid, errors } = validatePass(formState);
+    if (!valid) {
+      setError(errors); // Muestra los errores si los hay
+      return;
+    }
 
-   setLoading(true);
-
+    setLoading(true);
 
     const result = await signIn("credentials", {
       redirect: false,
@@ -113,7 +115,7 @@ export default function LoginForm() {
               )}
             </div>
 
-            <div className="mt-4">
+            <div className="mt-4 relative">
               <label
                 className="mb-3 mt-5 block text-xs font-medium text-gray-900"
                 htmlFor="password"
@@ -125,13 +127,24 @@ export default function LoginForm() {
                   className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 text-black placeholder:text-gray-500"
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={formState.password}
                   onChange={handleInputChange}
                   required
                   placeholder="Introduce tu contraseña"
                 />
                 <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-3 flex items-center focus:outline-none"
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-500" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-500" />
+                  )}
+                </button>
               </div>
               {error.password && (
                 <p className="text-red-500 text-xs">{error.password}</p>
