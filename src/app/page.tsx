@@ -1,8 +1,11 @@
-import Image from "next/image";
+
 import altour from '../../public/altour.png';
 import { waffleSoft, lato } from "./ui/fonts";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import Carrusel from "./ui/carrousel";
+import Link from "next/link";
+import { lusitana } from "@/app/ui/fonts";
+import Image from "next/image";
 export default function Home() {
   let recomendaciones = [
     { id: 1, nombre: "La Sagrada Familia", descripcion: "La obra maestra inacabada de Antoni Gaudí es un icono mundial. Esta basílica, con sus torres y fachadas repletas de detalles, es una muestra impresionante del modernismo catalán. Cada rincón de la Sagrada Familia es una sorpresa visual, desde sus coloridas vidrieras hasta sus formas orgánicas inspiradas en la naturaleza)" },
@@ -18,31 +21,25 @@ export default function Home() {
   ]
 
   return (
-    <main className="flex min-h-screen flex-col p-6 pb-12 mb-7">
-    <div className="flex justify-center text-3xl">
-      <h1>Bienvenido/a Usuario</h1>
-    </div>
-    <div className="flex justify-center mt-5">
-      <div className="basis-1/6 flex justify-start items-center">
-        <p className="text-2xl pl-4">Mapa?</p>
+    <main className="flex min-h-screen flex-col p-6">
+
+ 
+      <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
+        <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 px-6 py-10 md:w-2/5 md:px-20">
+          <p
+            className={`${lusitana} text-xl text-gray-800 md:text-3xl md:leading-normal`}
+          >
+            <strong>Welcome to Altour.</strong> Turismo sostenible. Descubre
+            todas las posibilidades.
+          </p>
+          <Link
+            href="/login"
+            className="flex items-center gap-5 self-start rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
+          >
+            <span>Log in</span> <ArrowRightIcon className="w-5 md:w-6" />
+          </Link>
+        </div>
       </div>
-      <div className="basis-5/6 flex justify-center items-center">
-        <Image src="/isotipo_altour.png" alt="altour logo" width={300} height={200} />
-      </div>
-    </div>
-    <div>
-      <h2 className="text-3xl pl-4 mb-2">Recomendaciones</h2>
-      <Carrusel slides={recomendaciones} />
-
-    </div>
-    <div>
-      <h2 className="text-3xl pl-4 mb-2">Categorías</h2>
-      <Carrusel slides={categorias} />
-
-    </div>
-
-
-
-  </main>
+    </main>
   );
 }

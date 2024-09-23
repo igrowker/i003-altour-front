@@ -1,13 +1,35 @@
-
-import type { Metadata } from "next";
-import { waffleSoft, lato } from "./ui/fonts";
+import "@/app/globals.css";
+import { inter } from "@/app/ui/fonts";
 import "./globals.css";
 import Navbar from "./components/navbar";
 import { Providers } from "./Providers";
 
 export const metadata: Metadata = {
-  title: "Altour",
-  description: "Turismo sostenible",
+  title: 'Altour | Turismo sostenible',
+  description:
+    'Aplicación web para recomendar lugares de interés en tiempo real en función de la afluencia de gente.',
+  keywords: [
+    'afluencia',
+    'gente',
+    'ocupacion',
+    'interés',
+    'lugares',
+    'destinos',
+    'viajes',
+    'recomendaciones',
+    'recomendación',
+    'recomendar',
+    'cercano',
+    'mapa',
+    'turismo',
+    'ocio',
+    'vacaciones',
+    'viaje',
+    'viajero',
+    'turista',
+  ],
+  creator: 'Altour',
+  publisher: 'Altour',
 };
 
 export default function RootLayout({
@@ -18,7 +40,7 @@ export default function RootLayout({
  
   return (
     <html lang="en">
-      <body className={lato.className}>
+      <body className={inter.className}>
         <Providers>
           <Navbar />
           {children}
