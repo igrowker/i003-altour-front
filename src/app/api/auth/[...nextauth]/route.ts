@@ -4,7 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 
 //Credentials Authentication
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcrypt"
+//import { compare } from "bcrypt" //TODO: Eliminar bcrypt si no es necesario después de integración.
 
 const handler = NextAuth({
   providers: [
@@ -19,7 +19,7 @@ const handler = NextAuth({
         email: {
           label: "Email",
           type: "email",
-          placeholder: "you@example.com",
+          placeholder: "user@example.com",
         },
         password: { label: "Password", type: "password" },
       },
