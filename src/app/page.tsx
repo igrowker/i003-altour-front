@@ -24,3 +24,8 @@ export default function Home() {
         >
           <span>Log in</span> <ArrowRightIcon className="w-5 md:w-6" />
         </Link>
+        </div>
+    </div>
+  </main>
+  );
+}
