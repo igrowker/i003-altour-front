@@ -34,7 +34,7 @@ const CarruselRecomendaciones:React.FC<CarruselRecomendacionesProps> =     ({ re
                 {recomendaciones.map((recomendacion) => (
                     <div key={recomendacion.id} className="w-full flex-shrink-0"> {/* Cada slide ocupa el 100% del ancho */}
                         <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mx-auto">
-                            <a href="#">
+                            <a href="#" className="flex justify-center">
                                 <Image src="/isotipo_altour.png" alt="altour logo" width={150} height={200} />
                             </a>
                             <div className="p-5">
