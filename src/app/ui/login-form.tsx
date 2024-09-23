@@ -6,6 +6,8 @@ import { AtSymbolIcon, KeyIcon } from "@heroicons/react/24/outline";
 import { Button } from "./button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { validatePass } from "../lib/formValidation"; // Importa la función de validación
+
 
 // Estado inicial del formulario
 interface FormState {
@@ -34,38 +36,27 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+
   // Maneja cambios en los inputs y actualiza el estado
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormState({ ...formState, [e.target.name]: e.target.value });
     setError({ ...error, [e.target.name]: "" }); // Limpia el error correspondiente
   };
 
-  // Valida los inputs
-  const validateForm = (): boolean => {
-    let valid = true;
-    let newErrors: ErrorState = {};
-
-
-    //regex 1 mayuscula 1 numero y 4 caracteres
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{4,}$/;
-    if (!passwordRegex.test(formState.password)) {
-      newErrors.password =
-        "La contraseña debe tener al menos 1 mayúscula, 1 minúscula, 1 número y mínimo 4 caracteres.";
-      valid = false;
-    }
-
-    setError(newErrors);
-    return valid;
-  };
-
+ 
   // Función que maneja el envío del formulario
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    // Validaciones previas
-    if (!validateForm()) return;
+   // Usa la función de validación importada
+   const { valid, errors } = validatePass(formState);
+   if (!valid) {
+     setError(errors); // Muestra los errores si los hay
+     return;
+   }
 
-    setLoading(true);
+   setLoading(true);
+
 
     const result = await signIn("credentials", {
       redirect: false,
