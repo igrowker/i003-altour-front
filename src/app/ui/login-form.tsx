@@ -1,59 +1,92 @@
 "use client";
 
+import { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
 import {
   AtSymbolIcon,
   KeyIcon,
-  ExclamationCircleIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "./button";
-
-import { signIn, useSession } from "next-auth/react";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { validatePass } from "../lib/formValidation"; // Importa la función de validación
+
+// Estado inicial del formulario
+interface FormState {
+  email: string;
+  password: string;
+}
+
+// Estado inicial de los errores
+interface ErrorState {
+  email?: string;
+  password?: string;
+}
 
 export default function LoginForm() {
-  //Google Auth
+  // Sesión con Google Auth
   const { data: session } = useSession();
-  console.log(session);
+  console.log("session", session);
 
-  //Credentials Auth
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  //Credentials Auth en un estado
+  const [formState, setFormState] = useState<FormState>({
+    email: "",
+    password: "",
+  });
+
+  const [error, setError] = useState<ErrorState>({});
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const [showPassword, setShowPassword] = useState(false);
 
+  // Maneja cambios en los inputs y actualiza el estado
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormState({ ...formState, [e.target.name]: e.target.value });
+    setError({ ...error, [e.target.name]: "" }); // Limpia el error correspondiente
+  };
+
+  // Función que maneja el envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+
+    // Usa la función de validación importada
+    const { valid, errors } = validatePass(formState);
+    if (!valid) {
+      setError(errors); // Muestra los errores si los hay
+      return;
+    }
+
+    setLoading(true);
 
     const result = await signIn("credentials", {
       redirect: false,
-      email,
-      password,
-      callbackUrl,
+      email: formState.email,
+      password: formState.password,
+      callbackUrl: "/",
     });
 
-    //TODO: borrar clgs cuando funcione correctamente login
-    console.log("credentialsResult", result);
-    console.log(email, password);
+    setLoading(false);
 
-    if (result?.error) {
-      setError("Invalid email or password");
+    if (result && !result.error) {
+      router.push(result.url || "/");
     } else {
-      router.push(callbackUrl);
+      setError({ ...error, email: "Correo o contraseña inválidos" });
     }
+  };
+
+  // Autenticación con Google
+  const handleGoogleSignIn = async () => {
+    await signIn("google", { callbackUrl: "/" });
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Iniciar Sesion</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error.email && <p className="text-red-500 mb-4">{error.email}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="w-full">
@@ -70,16 +103,19 @@ export default function LoginForm() {
                   id="email"
                   name="email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formState.email}
+                  onChange={handleInputChange}
                   required
                   placeholder="ejemplo@correo.com"
                 />
                 <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
               </div>
+              {error.email && (
+                <p className="text-red-500 text-xs">{error.email}</p>
+              )}
             </div>
 
-            <div className="mt-4">
+            <div className="mt-4 relative">
               <label
                 className="mb-3 mt-5 block text-xs font-medium text-gray-900"
                 htmlFor="password"
@@ -91,51 +127,68 @@ export default function LoginForm() {
                   className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 text-black placeholder:text-gray-500"
                   id="password"
                   name="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Introduce tu contraseña"
+                  type={showPassword ? "text" : "password"}
+                  value={formState.password}
+                  onChange={handleInputChange}
                   required
+                  placeholder="Introduce tu contraseña"
                 />
                 <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-3 flex items-center focus:outline-none"
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-500" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-500" />
+                  )}
+                </button>
               </div>
+              {error.password && (
+                <p className="text-red-500 text-xs">{error.password}</p>
+              )}
             </div>
           </div>
 
           <div>
-            <Button type="submit">Iniciar sesión</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Cargando..." : "Iniciar sesión"}
+            </Button>
+
             <div className="flex items-center justify-center space-x-2 mt-5">
               <p className="text-xs font-medium text-gray-900">
                 ¿No tienes una cuenta?
               </p>
-              <Link key="Register" href="/register">
+              <Link href="/register">
                 <p className="text-xs font-medium text-[#FE2A5C] hover:text-blue-800">
                   Regístrate
                 </p>
               </Link>
             </div>
           </div>
-          <div>
-            <div className="flex items-center">
-              <div className="flex-grow border-t border-gray-300"></div>
-              <span className="px-4 text-gray-500">O bien</span>
-              <div className="flex-grow border-t border-gray-300"></div>
-            </div>
 
-            <button
-              className="flex items-center justify-center w-[328px] h-[48px] border border-gray-300 rounded-md px-4 py-2"
-              onClick={() => signIn()}
-            >
-              <img
-                src="/google-icon.svg"
-                alt="Google Logo"
-                className="w-5 h-5 mr-3"
-              />
-              <span className="text-gray-700 text-sm font-medium">
-                Continue with Google{" "}
-              </span>
-            </button>
+          <div className="flex items-center justify-center mt-5">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="px-4 text-gray-500">O bien</span>
+            <div className="flex-grow border-t border-gray-300"></div>
           </div>
+
+          <button
+            type="button"
+            className="flex items-center justify-center w-full h-[48px] border border-gray-300 rounded-md px-4 py-2 mt-3"
+            onClick={handleGoogleSignIn}
+          >
+            <img
+              src="/google-icon.svg"
+              alt="Google Logo"
+              className="w-5 h-5 mr-3"
+            />
+            <span className="text-gray-700 text-sm font-medium">
+              Continuar con Google
+            </span>
+          </button>
         </form>
       </div>
     </div>
