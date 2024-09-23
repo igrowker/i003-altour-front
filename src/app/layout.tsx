@@ -1,18 +1,24 @@
-import "@/app/globals.css";
-import { inter } from "@/app/ui/fonts";
+
+import type { Metadata } from "next";
+import { waffleSoft, lato } from "./ui/fonts";
 import "./globals.css";
-import Navbar from "./ui/navbar";
+import Navbar from "./components/navbar";
 import { Providers } from "./Providers";
+
+export const metadata: Metadata = {
+  title: "Altour",
+  description: "Turismo sostenible",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
  
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={lato.className}>
         <Providers>
           <Navbar />
           {children}
