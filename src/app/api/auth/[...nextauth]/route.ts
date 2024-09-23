@@ -25,7 +25,7 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         // FIXME: Añadir la lógica aquí para buscar el usuario en la base de datos y comparar las credenciales proporcionadas con el usuario de la BD
-        const user = { id: "1", name: "John Doe", email: credentials?.email }; //usuario hardcodeado - implementar lógica para buscar al usario en BD
+        const user = { id: "1", name: "John", email: credentials?.email }; //usuario hardcodeado - implementar lógica para buscar al usario en BD
 
         // Aquí puedes validar las credenciales con tu base de datos o API
         if (
@@ -41,10 +41,29 @@ const handler = NextAuth({
       },
     }),
   ],
+  pages: {
+    signIn: "/login", // Redirige al login si no está autenticado
+  },
 
+  // session: {
+  //   strategy: "jwt",
+  // },
 
-  session: {
-    strategy: "jwt",
+  callbacks: {
+    async session({ session, token }) {
+      // Asigna token.user a session.user, asegurando que el tipo de token.user es correcto
+      if (token?.user) {
+        session.user = token.user as { name?: string | null; email?: string | null; image?: string | null };
+      }
+      return session;
+    },
+    async jwt({ token, user }) {
+      // Si es la primera vez, añade el user al token
+      if (user) {
+        token.user = user;
+      }
+      return token;
+    },
   },
 
   secret: process.env.NEXTAUTH_SECRET,
