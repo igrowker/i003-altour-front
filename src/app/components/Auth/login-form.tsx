@@ -8,10 +8,10 @@ import {
   EyeIcon,
   EyeSlashIcon,
 } from "@heroicons/react/24/outline";
-import { Button } from "./button";
+import { Button } from "@/app/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { validatePass } from "../lib/formValidation"; // Importa la función de validación
+import { validatePass } from "@/app/lib/formValidation"; // Importa la función de validación
 
 // Estado inicial del formulario
 interface FormState {
