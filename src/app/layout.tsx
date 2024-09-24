@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import "@/app/globals.css";
 import { inter } from "@/app/ui/fonts";
 import "./globals.css";
@@ -39,7 +40,7 @@ export default function RootLayout({
 }) {
  
   return (
-    <html lang="en">
+    <html lang="es">
       <body className={inter.className}>
         <Providers>
           <Navbar />
