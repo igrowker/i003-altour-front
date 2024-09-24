@@ -1,6 +1,6 @@
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { lusitana } from "@/app/ui/fonts";
+import { lusitana, waffleSoft, lato } from "@/app/ui/fonts";
 import Image from "next/image";
 import Carrusel from "./ui/carrousel";
 import Heatmap from "./components/Heatmap/Heatmap";
@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col p-6 pb-12 mb-7">
       <div className="flex justify-center text-3xl">
-        <h1>Bienvenido/a Usuario</h1>
+        <h1 className={`${waffleSoft.className}`}>Bienvenido/a Usuario</h1>
       </div>
       <div className="flex justify-center mt-5" >
         <div className="flex justify-center items-center w-full h-full">
@@ -35,11 +35,11 @@ export default function Home() {
       </div>
 
       <div>
-        <h2 className="text-3xl pl-4 mb-2">Recomendaciones</h2>
+        <h2 className={`${waffleSoft.className} text-2xl pl-4 mb-2`}>Recomendaciones</h2>
         <Carrusel slides={recomendaciones} />
       </div>
       <div>
-        <h2 className="text-3xl pl-4 mb-2">Categorías</h2>
+        <h2 className={`${waffleSoft.className} text-2xl pl-4 mb-2`}>Categorías</h2>
         <Carrusel slides={categorias} />
       </div>
     </main>

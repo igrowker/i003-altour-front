@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import { inter } from "@/app/ui/fonts";
+import { inter, lato } from "@/app/ui/fonts";
 import "./globals.css";
 import Navbar from "./ui/navbar";
 import { Providers } from "./Providers";
@@ -41,7 +41,7 @@ export default function RootLayout({
  
   return (
     <html lang="es">
-      <body className={inter.className}>
+      <body className={lato.className}>
         <Providers>
           <Navbar />
           {children}
