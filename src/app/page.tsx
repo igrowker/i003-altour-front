@@ -26,7 +26,10 @@ export default function Home() {
       <div className="flex justify-center mt-5" >
         <div className="flex justify-center items-center w-full h-full">
           <div className="w-full h-full">
-            <Heatmap />
+          <Heatmap 
+            searchAndCard={false}
+            containerStyle={{ width: '100%', height: '200px' }} 
+          />
           </div>
         </div>
       </div>

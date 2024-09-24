@@ -7,7 +7,15 @@ import CardMap from './CardMap';
 
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-const Heatmap: React.FC = () => {
+interface HeatmapProps {
+  searchAndCard: boolean;
+  containerStyle: {
+    width: string;
+    height: string;
+  }
+}
+
+const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
   const [geolocation, setGeolocation] = useState<{ lat: number; lng: number } | null>(null); // Ubicación actual
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null); // Instancia del mapa
   const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([]); // Predicciones de búsqueda
@@ -118,15 +126,17 @@ const Heatmap: React.FC = () => {
   return (
     <div className="relative h-screen">
       <LoadScript googleMapsApiKey={googleMapsApiKey} libraries={['visualization', 'places']}>
+        {searchAndCard && (
         <SearchOnMap 
           onSearch={handleSearch}
           onSelectPrediction={handleSelectPrediction}
           predictions={predictions}
         />
+        )}
         <GoogleMap
           mapContainerStyle={{
-            width: '100%',
-            height: 'calc(100svh - 145px)',
+            width: containerStyle.width,
+            height: containerStyle.height
            }}
           center={geolocation || {
             lat: 40.4167,
@@ -157,7 +167,9 @@ const Heatmap: React.FC = () => {
           )}
         </GoogleMap>
       </LoadScript>
+      {searchAndCard && (
     <CardMap placeDetails={placeDetails} />
+      )}
     </div>
   );
 };
