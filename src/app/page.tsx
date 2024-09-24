@@ -3,6 +3,7 @@ import Link from "next/link";
 import { lusitana } from "@/app/ui/fonts";
 import Image from "next/image";
 import Carrusel from "./ui/carrousel";
+import Heatmap from "./components/Heatmap/Heatmap";
 export default function Home() {
   let recomendaciones = [
     { id: 1, nombre: "La Sagrada Familia", descripcion: "La obra maestra inacabada de Antoni Gaudí es un icono mundial. Esta basílica, con sus torres y fachadas repletas de detalles, es una muestra impresionante del modernismo catalán. Cada rincón de la Sagrada Familia es una sorpresa visual, desde sus coloridas vidrieras hasta sus formas orgánicas inspiradas en la naturaleza)" },
@@ -22,27 +23,25 @@ export default function Home() {
       <div className="flex justify-center text-3xl">
         <h1>Bienvenido/a Usuario</h1>
       </div>
-      <div className="flex justify-center mt-5">
-        <div className="basis-1/6 flex justify-start items-center">
-          <p className="text-2xl pl-4">Mapa?</p>
-        </div>
-        <div className="basis-5/6 flex justify-center items-center">
-          <Image src="/isotipo_altour.png" alt="altour logo" width={300} height={200} />
+      <div className="flex justify-center mt-5" >
+        <div className="flex justify-center items-center w-full h-full">
+          <div className="w-full h-full">
+          <Heatmap 
+            searchAndCard={false}
+            containerStyle={{ width: '100%', height: '200px' }} 
+          />
+          </div>
         </div>
       </div>
+
       <div>
         <h2 className="text-3xl pl-4 mb-2">Recomendaciones</h2>
         <Carrusel slides={recomendaciones} />
-
       </div>
       <div>
         <h2 className="text-3xl pl-4 mb-2">Categorías</h2>
         <Carrusel slides={categorias} />
-
       </div>
-
-
-
     </main>
   );
 }
