@@ -1,5 +1,5 @@
 "use client";
-import { useAxios } from "../../hooks/useAxios";
+import { useRequest } from "@/app/hooks/useRequest"; // Importar el hook centralizado
 import { useEffect, useState } from "react";
 import {
   GoogleMap,
@@ -37,8 +37,8 @@ const Heatmap: React.FC = () => {
 
   // const { apiFetch } = useFetch(); //hook useFetch
 
-  // Usar el hook useAxios para las peticiones:
-  const { apiFetch, loading, error } = useAxios();
+  // Usar el hook useRequest para las peticiones:
+  const { apiFetch, loading, error } = useRequest();
 
   // Geolocalización
   useEffect(() => {
@@ -61,7 +61,7 @@ const Heatmap: React.FC = () => {
   };
 
   // Carga de datos para el mapa de calor desde la API
-  // Código modificado para usar el hook useAxios:
+  // Código modificado para usar el hook useRequest:
   useEffect(() => {
     const loadHeatmapData = async () => {
       try {
@@ -90,7 +90,10 @@ const Heatmap: React.FC = () => {
           let destTransformedData = [];
           if (currentDestination) {
             const destData = await apiFetch({
-              url: constructHeatmapUrl(currentDestination.lat, currentDestination.lng), // URL construida dinámicamente
+              url: constructHeatmapUrl(
+                currentDestination.lat,
+                currentDestination.lng
+              ), // URL construida dinámicamente
               method: "GET",
               params: {
                 lat: currentDestination.lat,

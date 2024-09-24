@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios, { AxiosRequestConfig } from "axios";
 
 // Hook personalizado para centralizar peticiones
-export const useAxios = () => {
+export const useRequest = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 

@@ -1,6 +1,6 @@
 "use client";
 
-//TODO: llamada API está hecha desde hook useAxios.
+//TODO: llamada API está hecha desde hook useRequest.
 //TODO: comprobar si la llamada deja de dar error CORS
 //TODO: borrar comentarios.
 
@@ -10,7 +10,7 @@ import { Button } from "@/app/ui/button";
 import { EyeIcon, EyeSlashIcon, KeyIcon } from "@heroicons/react/24/outline";
 import Modal from "@/app/ui/dialog-panel";
 import { validatePass } from "@/app/lib/formValidation";
-import { useAxios } from "@/app/hooks/useAxios"; // Importar el hook centralizado
+import { useRequest } from "@/app/hooks/useRequest"; // Importar el hook centralizado
 
 interface FormData {
   username: string;
@@ -41,7 +41,7 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { apiFetch, loading, error: fetchError } = useAxios();
+  const { apiFetch, loading, error: fetchError } = useRequest();
 
   const { username, email, password, confirmPassword, acceptedTOS } = formData;
 
@@ -81,7 +81,7 @@ export default function RegisterForm() {
 
     console.log("formData", formData);
 
-    // Lógica para enviar el formulario a la API (usando el hook useAxios)
+    // Lógica para enviar el formulario a la API (usando el hook useRequest)
     try {
       const data = await apiFetch({
         url: `/auth/register`,
