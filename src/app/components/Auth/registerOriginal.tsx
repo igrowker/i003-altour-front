@@ -1,6 +1,6 @@
 "use client";
 
-//TODO: llamada API está hecha desde hook useAxios.
+//TODO: llamada a la API está hecha desde este componente y no desde hook
 //TODO: comprobar si la llamada deja de dar error CORS
 //TODO: borrar comentarios.
 
@@ -10,7 +10,7 @@ import { Button } from "@/app/ui/button";
 import { EyeIcon, EyeSlashIcon, KeyIcon } from "@heroicons/react/24/outline";
 import Modal from "@/app/ui/dialog-panel";
 import { validatePass } from "@/app/lib/formValidation";
-import { useAxios } from "@/app/hooks/useAxios"; // Importar el hook centralizado
+import axios from "axios";
 
 interface FormData {
   username: string;
@@ -19,7 +19,6 @@ interface FormData {
   confirmPassword: string;
   acceptedTOS: boolean;
 }
-
 interface ErrorState {
   email?: string;
   password?: string;
@@ -36,12 +35,10 @@ export default function RegisterForm() {
   });
 
   const [error, setError] = useState<ErrorState>({});
-  const [showTermsModal, setShowTermsModal] = useState(false);
-  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false); // Para términos y condiciones
+  const [showWarningModal, setShowWarningModal] = useState(false); // Para advertencia aceptación
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const { apiFetch, loading, error: fetchError } = useAxios();
 
   const { username, email, password, confirmPassword, acceptedTOS } = formData;
 
@@ -81,35 +78,39 @@ export default function RegisterForm() {
 
     console.log("formData", formData);
 
-    // Lógica para enviar el formulario a la API (usando el hook useAxios)
+    // Aquí lógica para enviar el formulario a la API directamente desde este componente.
     try {
-      const data = await apiFetch({
-        url: `/auth/register`,
-        method: "POST",
-        data: formData,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (data) {
         console.log("Registro exitoso:", data);
-        //TODO: Redirigir o mostrar mensaje de éxito y redirigir al usuario a la página de login
+        //TODO: redirigir al usuario a la página de login, o iniciar sesión automáticamente
+      } else {
+        console.error("Error en el registro:");
+        // Manejar error de registro (usuario ya existe, error en el servidor, etc.)
       }
     } catch (error) {
-      console.error("Error en el registro:", fetchError || error);
+      console.error("Error en el fetch:", error);
     }
   };
 
   //FIXME: Como envío los datos de Google a Backend?
   const handleGoogleSignUp = () => {
-    // Mostrar advertencia si no ha aceptado los Terms of Use antes de intentar registrarse con Google
+    // Mostrar advertencia si no ha aceptado los términos antes de intentar registrarse con Google
     if (!acceptedTOS) {
       setShowWarningModal(true);
       return;
     }
 
-    TODO:// Aquí iría la lógica para el registro con Google
+    //TODO: Aquí iría la lógica para el registro con Google
     console.log("Registro con Google");
   };
 

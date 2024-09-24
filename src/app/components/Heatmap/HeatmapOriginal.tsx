@@ -1,5 +1,4 @@
 "use client";
-import { useAxios } from "../../hooks/useAxios";
 import { useEffect, useState } from "react";
 import {
   GoogleMap,
@@ -8,7 +7,7 @@ import {
   HeatmapLayer,
 } from "@react-google-maps/api";
 import SearchOnMap from "./SearchOnMap";
-//import { useFetch } from "../../hooks/useFetch";
+import { useFetch } from "../../hooks/useFetch";
 import CardMap from "./CardMap";
 
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -35,10 +34,7 @@ const Heatmap: React.FC = () => {
     Array<{ location: google.maps.LatLng; weight: number }>
   >([]); // Puntos para el mapa de calor
 
-  // const { apiFetch } = useFetch(); //hook useFetch
-
-  // Usar el hook useAxios para las peticiones:
-  const { apiFetch, loading, error } = useAxios();
+  const { apiFetch } = useFetch();
 
   // Geolocalización
   useEffect(() => {
@@ -55,26 +51,37 @@ const Heatmap: React.FC = () => {
     );
   }, []);
 
-  // Construir la URL dinámica basada en la geolocalización o el destino
-  const constructHeatmapUrl = (lat: number, lng: number) => {
-    return `http://localhost:8080/api/heat-map?lat=${lat}&lng=${lng}&rad=40`;
-  };
-
-  // Carga de datos para el mapa de calor desde la API
-  // Código modificado para usar el hook useAxios:
+  // Carga de datos para el mapa de calor
   useEffect(() => {
     const loadHeatmapData = async () => {
-      try {
-        if (geolocation || currentDestination) {
-          const geoData = geolocation
-            ? await apiFetch({
-                url: constructHeatmapUrl(geolocation.lat, geolocation.lng), // URL construida dinámicamente
-                method: "GET",
-                params: { lat: geolocation.lat, lng: geolocation.lng }, // Parámetros de la geolocalización
-              })
-            : [];
+      if (geolocation || currentDestination) {
+        const geoData = geolocation
+          ? await apiFetch("heatmapData", {
+              lat: geolocation.lat,
+              lng: geolocation.lng,
+            })
+          : [];
 
-          const geoTransformedData = geoData.map(
+        const geoTransformedData = geoData.map(
+          (point: {
+            location: { lat: number; lng: number };
+            weight: number;
+          }) => ({
+            location: new google.maps.LatLng(
+              point.location.lat,
+              point.location.lng
+            ),
+            weight: point.weight,
+          })
+        );
+
+        let destTransformedData = [];
+        if (currentDestination) {
+          const destData = await apiFetch("heatmapData", {
+            lat: currentDestination.lat,
+            lng: currentDestination.lng,
+          });
+          destTransformedData = destData.map(
             (point: {
               location: { lat: number; lng: number };
               weight: number;
@@ -86,42 +93,15 @@ const Heatmap: React.FC = () => {
               weight: point.weight,
             })
           );
-
-          let destTransformedData = [];
-          if (currentDestination) {
-            const destData = await apiFetch({
-              url: constructHeatmapUrl(currentDestination.lat, currentDestination.lng), // URL construida dinámicamente
-              method: "GET",
-              params: {
-                lat: currentDestination.lat,
-                lng: currentDestination.lng,
-              }, // Parámetros del destino
-            });
-            destTransformedData = destData.map(
-              (point: {
-                location: { lat: number; lng: number };
-                weight: number;
-              }) => ({
-                location: new google.maps.LatLng(
-                  point.location.lat,
-                  point.location.lng
-                ),
-                weight: point.weight,
-              })
-            );
-          }
-
-          setHeatmapPoints([...geoTransformedData, ...destTransformedData]);
         }
-      } catch (err) {
-        console.error("Error cargando los datos del mapa de calor:", err);
+
+        setHeatmapPoints([...geoTransformedData, ...destTransformedData]);
       }
     };
 
     loadHeatmapData();
   }, [geolocation, currentDestination]);
 
-  //Resto de código no cambia:
   // Autocompletado para la búsqueda de lugares
   const handleSearch = (term: string) => {
     if (mapInstance) {
