@@ -6,10 +6,10 @@
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
-import { Button } from "./button";
+import { Button } from "@/app/ui/button";
 import { EyeIcon, EyeSlashIcon, KeyIcon } from "@heroicons/react/24/outline";
-import Modal from "./dialog-panel";
-import { validatePass } from "../lib/formValidation";
+import Modal from "@/app/ui/dialog-panel";
+import { validatePass } from "@/app/lib/formValidation";
 
 interface FormData {
   name: string;

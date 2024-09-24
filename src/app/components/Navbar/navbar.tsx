@@ -1,6 +1,6 @@
 "use client";
 
-import NavLinks from "@/app/ui/nav-links";
+import NavLinks from "./nav-links";
 import { PowerIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
 
