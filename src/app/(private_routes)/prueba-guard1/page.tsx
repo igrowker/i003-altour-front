@@ -35,7 +35,7 @@ export default function PruebaGuard1() {
         setTimeout(() => {
           router.push("/login");
         }, 3000); 
-    return <div>No tienes acceso a esta página.</div>; 
+    return <div> <p>Inicia sesión para disfrutar de todo lo que te ofrece Altour.</p> </div>; 
   }
 }
   return (

@@ -1,3 +1,4 @@
+//archivo que si tiene las validaciones y restricciones para login
 import NextAuth from "next-auth";
 //OAuth Google Authentication
 import GoogleProvider from "next-auth/providers/google";

@@ -21,11 +21,8 @@ export async function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-
 // Definir las rutas que deben pasar por el middleware
 export const config = {
-    matcher: ['/prueba-guard1/:path*', '/prueba-guard2/:path*'], // Rutas protegidas
-  };
-
-
-
+  //TODO: añadir las rutas que quieras proteger solo para usuarios logueados:
+  matcher: ["/prueba-guard1/:path*", "/prueba-guard2/:path*"], // Rutas protegidas
+};

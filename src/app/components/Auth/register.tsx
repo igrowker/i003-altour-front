@@ -1,7 +1,6 @@
 "use client";
 
-//TODO: implementar validaciones en los forms de registro y login
-//TODO: implementar la llamada a la API para enviar los datos
+//llamada API está hecha desde hook useRequest.
 //TODO: borrar comentarios.
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
@@ -10,14 +9,16 @@ import { Button } from "@/app/ui/button";
 import { EyeIcon, EyeSlashIcon, KeyIcon } from "@heroicons/react/24/outline";
 import Modal from "@/app/ui/dialog-panel";
 import { validatePass } from "@/app/lib/formValidation";
+import { useRequest } from "@/app/hooks/useRequest"; // Importar el hook centralizado
 
 interface FormData {
-  name: string;
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
-  accept: boolean;
+  acceptedTOS: boolean;
 }
+
 interface ErrorState {
   email?: string;
   password?: string;
@@ -26,20 +27,22 @@ interface ErrorState {
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState<FormData>({
-    name: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
-    accept: false,
+    acceptedTOS: false,
   });
 
   const [error, setError] = useState<ErrorState>({});
-  const [showTermsModal, setShowTermsModal] = useState(false); // Para términos y condiciones
-  const [showWarningModal, setShowWarningModal] = useState(false); // Para advertencia aceptación
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showWarningModal, setShowWarningModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { name, email, password, confirmPassword, accept } = formData;
+  const { apiFetch, loading, error: fetchError } = useRequest();
+
+  const { username, email, password, confirmPassword, acceptedTOS } = formData;
 
   // Maneja cambios en los campos del formulario
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +55,7 @@ export default function RegisterForm() {
   };
 
   // Maneja los errores y el envío del formulario
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const { valid, errors } = validatePass({ password });
@@ -70,23 +73,42 @@ export default function RegisterForm() {
       return;
     }
 
-    if (!accept) {
+    if (!acceptedTOS) {
       setShowWarningModal(true);
       return;
     }
 
     console.log("formData", formData);
-    // Aquí se puede llamar a una API o servicio de autenticación
+
+    // Lógica para enviar el formulario a la API (usando el hook useRequest)
+    try {
+      const data = await apiFetch({
+        url: `/auth/register`,
+        method: "POST",
+        data: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (data) {
+        console.log("Registro exitoso:", data);
+        //TODO: Redirigir o mostrar mensaje de éxito y redirigir al usuario a la página de login
+      }
+    } catch (error) {
+      console.error("Error en el registro:", fetchError || error);
+    }
   };
 
+  //FIXME: Como envío los datos de Google a Backend?
   const handleGoogleSignUp = () => {
-    // Mostrar advertencia si no ha aceptado los términos antes de intentar registrarse con Google
-    if (!accept) {
+    // Mostrar advertencia si no ha aceptado los Terms of Use antes de intentar registrarse con Google
+    if (!acceptedTOS) {
       setShowWarningModal(true);
       return;
     }
 
-    // Aquí iría la lógica para el registro con Google
+    TODO:// Aquí iría la lógica para el registro con Google
     console.log("Registro con Google");
   };
 
@@ -121,8 +143,8 @@ export default function RegisterForm() {
             <input
               className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 text-black placeholder:text-gray-500"
               type="text"
-              name="name"
-              value={name}
+              name="username"
+              value={username}
               onChange={handleInputChange}
               placeholder="Ejemplo: Daniel"
               required
@@ -161,7 +183,6 @@ export default function RegisterForm() {
                 name="password"
                 value={password}
                 onChange={handleInputChange}
-                // className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10" // Espacio para el icono
                 placeholder="Escribe una contraseña*"
                 required
               />
@@ -192,28 +213,28 @@ export default function RegisterForm() {
               Confirmar Contraseña
             </label>
             <div className="relative">
-            <input
-              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 text-black placeholder:text-gray-500"
-              type={showConfirmPassword ? "text" : "password"}
-              name="confirmPassword"
-              value={confirmPassword}
-              onChange={handleInputChange}
-              placeholder="Confirma tu contraseña*"
-              required
-            />
-                          <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 text-black placeholder:text-gray-500"
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={confirmPassword}
+                onChange={handleInputChange}
+                placeholder="Confirma tu contraseña*"
+                required
+              />
+              <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
 
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-3 flex items-center focus:outline-none"
-            >
-              {showConfirmPassword ? (
-                <EyeSlashIcon className="h-5 w-5 text-gray-500" />
-              ) : (
-                <EyeIcon className="h-5 w-5 text-gray-500" />
-              )}
-            </button>
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-3 flex items-center focus:outline-none"
+              >
+                {showConfirmPassword ? (
+                  <EyeSlashIcon className="h-5 w-5 text-gray-500" />
+                ) : (
+                  <EyeIcon className="h-5 w-5 text-gray-500" />
+                )}
+              </button>
             </div>
             {error.confirmPassword && (
               <p className="text-red-500 text-xs italic">
@@ -225,13 +246,13 @@ export default function RegisterForm() {
           <div className="mb-4 flex items-center">
             <input
               type="checkbox"
-              name="accept"
-              id="accept"
-              checked={accept}
+              name="acceptedTOS"
+              id="acceptedTOS"
+              checked={acceptedTOS}
               onChange={handleInputChange}
               className="mr-2 leading-tight"
             />
-            <label htmlFor="accept" className="text-sm text-gray-700">
+            <label htmlFor="acceptedTOS" className="text-sm text-gray-700">
               Acepto los
             </label>
             <span
