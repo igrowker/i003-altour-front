@@ -1,7 +1,6 @@
 "use client";
 
-//TODO: llamada API está hecha desde hook useRequest.
-//TODO: comprobar si la llamada deja de dar error CORS
+//llamada API está hecha desde hook useRequest.
 //TODO: borrar comentarios.
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
