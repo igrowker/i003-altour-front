@@ -1,6 +1,7 @@
 "use client";
 
 //llamada API está hecha desde hook useRequest.
+//TODO: implementar los mensajes de error que hay que enviarle al usuario.
 //TODO: borrar comentarios.
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
@@ -10,6 +11,7 @@ import { EyeIcon, EyeSlashIcon, KeyIcon } from "@heroicons/react/24/outline";
 import Modal from "@/app/ui/dialog-panel";
 import { validatePass } from "@/app/lib/formValidation";
 import { useRequest } from "@/app/hooks/useRequest"; // Importar el hook centralizado
+import { useRouter } from "next/navigation";
 
 interface FormData {
   username: string;
@@ -39,6 +41,7 @@ export default function RegisterForm() {
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
 
   const { apiFetch, loading, error: fetchError } = useRequest();
 
@@ -91,9 +94,27 @@ export default function RegisterForm() {
         },
       });
 
+      //FIXME: eliminar este objeto dataFake cuando termine las pruebas
+      const dataFake = {
+        ok: true,
+        token:
+          "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqQGouZXMiLCJpYXQiOjE3MjczNzU1OTUsImV4cCI6MTcyNzQ2MTk5NX0.L_S4RLVxMGQYZr11RcR7PHQu6ZgKK_gwC7RkKgZPKUX8yZI0GEpNX6me29cI7nmTtgzMB9-_k4vGshdJEJiouw",
+        user: {
+          username: "Doe",
+          email: "d@d.es",
+        },
+      };
+
+      if (!dataFake) {
+        //TODO: hacer lógica de mensaje en flotante o en página de error
+        return;
+      }  
+
       if (data) {
         console.log("Registro exitoso:", data);
-        //TODO: Redirigir o mostrar mensaje de éxito y redirigir al usuario a la página de login
+        //TODO: Falta mostrar mensaje de éxito antes de redirigir al usuario a la página de login
+        router.push("/login");
+        //No es necesario guardar el token en localStorage ya lo maneja NextAuth
       }
     } catch (error) {
       console.error("Error en el registro:", fetchError || error);
@@ -108,8 +129,8 @@ export default function RegisterForm() {
       return;
     }
 
-    TODO:// Aquí iría la lógica para el registro con Google
-    console.log("Registro con Google");
+    // Aquí iría la lógica para el registro con Google
+    TODO: console.log("Registro con Google");
   };
 
   return (
