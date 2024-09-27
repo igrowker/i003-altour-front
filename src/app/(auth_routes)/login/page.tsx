@@ -1,5 +1,5 @@
 //import AltourLogo from '@/app/ui/altour-logo';
-import LoginForm from '@/app/ui/login-form';
+import LoginForm from '@/app/components/Auth/login-form';
  
 export default function LoginPage() {
   return (

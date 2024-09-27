@@ -1,9 +1,14 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { GoogleMap, LoadScript, Marker, HeatmapLayer } from '@react-google-maps/api';
-import SearchOnMap from './SearchOnMap';
-import { useFetch } from '../../hooks/useFetch';
-import CardMap from './CardMap';
+"use client";
+import { useEffect, useState } from "react";
+import {
+  GoogleMap,
+  LoadScript,
+  Marker,
+  HeatmapLayer,
+} from "@react-google-maps/api";
+import SearchOnMap from "./SearchOnMap";
+import { useFetch } from "../../hooks/useFetch";
+import CardMap from "./CardMap";
 
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -18,11 +23,21 @@ interface HeatmapProps {
 const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
   const [geolocation, setGeolocation] = useState<{ lat: number; lng: number } | null>(null); // Ubicación actual
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null); // Instancia del mapa
-  const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([]); // Predicciones de búsqueda
-  const [currentMarker, setCurrentMarker] = useState<google.maps.Marker | null>(null); // Marcador actual
-  const [currentDestination, setCurrentDestination] = useState<{ lat: number; lng: number } | null>(null); // Destino actual
-  const [placeDetails, setPlaceDetails] = useState<google.maps.places.PlaceResult | null>(null); // Detalles del lugar seleccionado
-  const [heatmapPoints, setHeatmapPoints] = useState<Array<{ location: google.maps.LatLng; weight: number }>>([]); // Puntos para el mapa de calor
+  const [predictions, setPredictions] = useState<
+    google.maps.places.AutocompletePrediction[]
+  >([]); // Predicciones de búsqueda
+  const [currentMarker, setCurrentMarker] = useState<google.maps.Marker | null>(
+    null
+  ); // Marcador actual
+  const [currentDestination, setCurrentDestination] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null); // Destino actual
+  const [placeDetails, setPlaceDetails] =
+    useState<google.maps.places.PlaceResult | null>(null); // Detalles del lugar seleccionado
+  const [heatmapPoints, setHeatmapPoints] = useState<
+    Array<{ location: google.maps.LatLng; weight: number }>
+  >([]); // Puntos para el mapa de calor
 
   const { apiFetch } = useFetch();
 
@@ -36,7 +51,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
         });
       },
       (error) => {
-        console.error('Error obteniendo la ubicación:', error);
+        console.error("Error obteniendo la ubicación:", error);
       }
     );
   }, []);
@@ -46,21 +61,43 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
     const loadHeatmapData = async () => {
       if (geolocation || currentDestination) {
         const geoData = geolocation
-          ? await apiFetch('heatmapData', { lat: geolocation.lat, lng: geolocation.lng })
+          ? await apiFetch("heatmapData", {
+              lat: geolocation.lat,
+              lng: geolocation.lng,
+            })
           : [];
 
-        const geoTransformedData = geoData.map((point: { location: { lat: number; lng: number }; weight: number }) => ({
-          location: new google.maps.LatLng(point.location.lat, point.location.lng),
-          weight: point.weight,
-        }));
+        const geoTransformedData = geoData.map(
+          (point: {
+            location: { lat: number; lng: number };
+            weight: number;
+          }) => ({
+            location: new google.maps.LatLng(
+              point.location.lat,
+              point.location.lng
+            ),
+            weight: point.weight,
+          })
+        );
 
         let destTransformedData = [];
         if (currentDestination) {
-          const destData = await apiFetch('heatmapData', { lat: currentDestination.lat, lng: currentDestination.lng });
-          destTransformedData = destData.map((point: { location: { lat: number; lng: number }; weight: number }) => ({
-            location: new google.maps.LatLng(point.location.lat, point.location.lng),
-            weight: point.weight,
-          }));
+          const destData = await apiFetch("heatmapData", {
+            lat: currentDestination.lat,
+            lng: currentDestination.lng,
+          });
+          destTransformedData = destData.map(
+            (point: {
+              location: { lat: number; lng: number };
+              weight: number;
+            }) => ({
+              location: new google.maps.LatLng(
+                point.location.lat,
+                point.location.lng
+              ),
+              weight: point.weight,
+            })
+          );
         }
 
         setHeatmapPoints([...geoTransformedData, ...destTransformedData]);
@@ -76,18 +113,27 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
       const autocompleteService = new google.maps.places.AutocompleteService();
       const request: google.maps.places.AutocompletionRequest = {
         input: term,
-        location: new google.maps.LatLng(geolocation?.lat ?? 0, geolocation?.lng ?? 0),
+        location: new google.maps.LatLng(
+          geolocation?.lat ?? 0,
+          geolocation?.lng ?? 0
+        ),
         radius: 5000,
       };
 
-      autocompleteService.getPlacePredictions(request, (predictions, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-          setPredictions(predictions);
-        } else {
-          console.error('Error en el autocompletado:', status);
-          setPredictions([]);
+      autocompleteService.getPlacePredictions(
+        request,
+        (predictions, status) => {
+          if (
+            status === google.maps.places.PlacesServiceStatus.OK &&
+            predictions
+          ) {
+            setPredictions(predictions);
+          } else {
+            console.error("Error en el autocompletado:", status);
+            setPredictions([]);
+          }
         }
-      });
+      );
     }
   };
 
@@ -104,16 +150,20 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
           const newMarker = new google.maps.Marker({
             position: place.geometry?.location ?? new google.maps.LatLng(0, 0),
             map: mapInstance,
-            title: place.name ?? '',
+            title: place.name ?? "",
           });
 
           setCurrentMarker(newMarker);
-          mapInstance.setCenter(place.geometry?.location ?? new google.maps.LatLng(0, 0));
+          mapInstance.setCenter(
+            place.geometry?.location ?? new google.maps.LatLng(0, 0)
+          );
           setPlaceDetails(place);
           setPredictions([]);
-          setCurrentDestination(place.geometry?.location?.toJSON() ?? { lat: 0, lng: 0 });
+          setCurrentDestination(
+            place.geometry?.location?.toJSON() ?? { lat: 0, lng: 0 }
+          );
         } else {
-          console.error('Error obteniendo detalles del lugar:', status);
+          console.error("Error obteniendo detalles del lugar:", status);
         }
       });
     }
@@ -149,18 +199,18 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
         >
           {heatmapPoints.length > 0 && (
             <HeatmapLayer
-              data={heatmapPoints.map(point => ({
+              data={heatmapPoints.map((point) => ({
                 location: point.location,
                 weight: point.weight,
               }))}
               options={{
                 radius: 25,
                 gradient: [
-                  'rgba(0, 255, 0, 0)',
-                  'rgba(0, 255, 0, 0.5)',
-                  'rgba(255, 255, 0, 0.5)',
-                  'rgba(255, 165, 0, 0.5)',
-                  'rgba(255, 0, 0, 0.5)',
+                  "rgba(0, 255, 0, 0)",
+                  "rgba(0, 255, 0, 0.5)",
+                  "rgba(255, 255, 0, 0.5)",
+                  "rgba(255, 165, 0, 0.5)",
+                  "rgba(255, 0, 0, 0.5)",
                 ],
               }}
             />
