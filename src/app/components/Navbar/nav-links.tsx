@@ -1,12 +1,11 @@
 "use client";
 
 import {
-  HomeIcon,
   UserIcon,
   MapIcon,
   MagnifyingGlassIcon,
   HeartIcon,
-  PowerIcon
+  EyeIcon
 } from "@heroicons/react/24/outline";
 
 
@@ -18,7 +17,9 @@ const logo = "/isotipo_altour.png";
 const links = [
   { name: "Home", href: "/", icon: logo }, // El logo es una imagen
   { name: "Search", href: "/search", icon: MagnifyingGlassIcon },
-  { name: "Favorites", href: "/favorites", icon: HeartIcon },
+  { name: "Favorites", href: "/favorites", icon: HeartIcon }, 
+  { name: "Guard1", href: "/prueba-guard1", icon: EyeIcon },//FIXME: borrar cuando termine con pruebas guards
+  { name: "Guard2", href: "/prueba-guard2", icon: EyeIcon },//FIXME: borrar cuando termine con pruebas guards
   { name: "Map", href: "/heatmap", icon: MapIcon },
   { name: "User", href: "/user", icon: UserIcon },
 ];

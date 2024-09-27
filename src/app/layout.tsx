@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "@/app/globals.css";
 import { inter, lato } from "@/app/ui/fonts";
 import "./globals.css";
-import Navbar from "./ui/navbar";
+import Navbar from "./components/Navbar/navbar";
 import { Providers } from "./Providers";
 
 export const metadata: Metadata = {
