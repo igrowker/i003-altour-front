@@ -14,6 +14,7 @@ import { Button } from "@/app/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { validatePass } from "@/app/lib/formValidation"; // Importa la función de validación
+//import { useRequest } from "@/app/hooks/useRequest";
 
 // Estado inicial del formulario
 interface FormState {
@@ -40,8 +41,10 @@ export default function LoginForm() {
 
   const [error, setError] = useState<ErrorState>({});
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+
+  //const { apiFetch, loading: fetchLoading, error: fetchError } = useRequest()
 
   // Maneja cambios en los inputs y actualiza el estado
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,20 +65,25 @@ export default function LoginForm() {
 
     setLoading(true);
 
+    //no es necesario usar useRequest con signIn (NextJS hace la petición)
     const result = await signIn("credentials", {
-      redirect: false,
+      redirect: false, //evita redirección inmediata
       email: formState.email,
       password: formState.password,
-      callbackUrl: "/",
+      //callbackUrl: "/", //donde queremos redirigir
     });
 
     setLoading(false);
 
+    console.log(result)
+
     if (result && !result.error) {
-      router.push(result.url || "/");
+      router.push("/"); 
     } else {
       setError({ ...error, email: "Correo o contraseña inválidos" });
     }
+
+
   };
 
   // Autenticación con Google
