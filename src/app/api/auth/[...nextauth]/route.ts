@@ -1,11 +1,18 @@
-//archivo que si tiene las validaciones y restricciones para login
 import NextAuth from "next-auth";
-//OAuth Google Authentication
 import GoogleProvider from "next-auth/providers/google";
-
-//Credentials Authentication
 import CredentialsProvider from "next-auth/providers/credentials";
-//import { compare } from "bcrypt" //TODO: Eliminar bcrypt si no es necesario después de integración.
+import { User } from "next-auth";
+
+interface CustomUser extends User {
+  token: string;
+}
+
+declare module "next-auth" {
+  interface Session {
+    accessToken?: string;
+    user?: CustomUser;
+  }
+}
 
 const handler = NextAuth({
   providers: [
@@ -13,7 +20,6 @@ const handler = NextAuth({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
-
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -24,98 +30,101 @@ const handler = NextAuth({
         },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        // FIXME: Añadir la lógica aquí para buscar el usuario en la base de datos y comparar las credenciales proporcionadas con el usuario de la BD
-        const user = { id: "1", name: "John", email: credentials?.email }; //usuario hardcodeado - implementar lógica para buscar al usario en BD
 
-        // Aquí puedes validar las credenciales con tu base de datos o API
-        if (
-          credentials?.email === "user@example.com" &&
-          credentials?.password === "password123"
-        ) {
-          console.log("credentials", credentials)
-          console.log("user", user)
-          return user; // El usuario está autenticado correctamente
-        } else {
-          return null; // La autenticación falla si las credenciales no coinciden
+      async authorize(credentials) {
+        const loginUrl = `${process.env.API_URL}/auth/login`
+
+        if (!credentials) {
+          throw new Error("Credentials are required");
+        }
+
+
+        try {
+          // Hacer la solicitud al backend con las credenciales
+          const res = await fetch(
+            //TODO: cambiar la url de abajo por la variable: loginUrl
+            "https://altour-1.onrender.com/api/v1/auth/login",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            }
+          );
+
+          const token = await res.text(); // Si la respuesta es solo un string
+          console.log(token)
+
+          if (!res.ok || !token) {
+            throw new Error("Login failed");
+          }
+
+          // Devolver un objeto que extiende User, aquí usamos `CustomUser`
+          return { token } as CustomUser;
+        } catch (error) {
+          console.error(error);
+          throw new Error("Error during authentication");
         }
       },
     }),
   ],
-  pages: {
-    signIn: "/login", // Redirige al login si no está autenticado
-  },
-
-  // session: {
-  //   strategy: "jwt",
-  // },
-
   callbacks: {
-    async session({ session, token }) {
-      // Asigna token.user a session.user, asegurando que el tipo de token.user es correcto
-      if (token?.user) {
-        session.user = token.user as { name?: string | null; email?: string | null; image?: string | null };
-      }
-      return session;
-    },
     async jwt({ token, user }) {
-      // Si es la primera vez, añade el user al token
       if (user) {
-        token.user = user;
+        const customUser = user as CustomUser;
+        token.accessToken = customUser.token; // Guardamos el token en el JWT
       }
       return token;
     },
-  },
 
-  secret: process.env.NEXTAUTH_SECRET,
+    async session({ session, token }) {
+      if (typeof token.accessToken === 'string') {
+        session.accessToken = token.accessToken; // Pasamos el accessToken a la sesión si es string
+      } else {
+        session.accessToken = undefined; // Si no es un string, aseguramos que sea undefined
+      }
+      return session;
+    },
+  },
+  // secret: process.env.AUTH_SECRET, // Asegúrate de que AUTH_SECRET esté configurado
+  pages: {
+    signIn: "/auth/login",
+    error: "/auth/error",
+  },
 });
 
 export { handler as GET, handler as POST };
 
-//TODO: Ejemplo de código para implementar con SQL comparativa credenciales usuario vs usuario BD
+//Si esperamos un JSON del backend:
+// async authorize(credentials) {
+//   //const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+//   if (!credentials) {
+//     return null;
+//   }
+//   // Aquí haces la petición POST a tu backend con las credenciales
+//   const res = await fetch("https://altour-1.onrender.com/api/v1/auth/login", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({
+//       email: credentials.email,
+//       password: credentials.password,
+//     }),
+//   });
 
-/*[
-  CredentialsProvider({
-    // The name to display on the sign in form (e.g. 'Sign in with...')
-    name: "Credentials",
-    credentials: {
-      email: {},
-      password: {},
-    },
-    async authorize(credentials, req) {
-      const response = await sql`
-        SELECT * FROM users WHERE email=${credentials?.email}
-      `;
-      const user = response.rows[0];
+//   // Si la respuesta es exitosa, obtenemos el token y los datos del usuario
+//   const user = await res.json(); // Esto falla si el servidor no devuelve JSON
 
-      const passwordCorrect = await compare(
-        credentials?.password || "",
-        user.password
-      );
-
-      if (passwordCorrect) {
-        return {
-          id: user.id,
-          email: user.email,
-        };
-      }
-
-      console.log("credentials", credentials);
-      return null;
-    },
-  }),
-],
-*/
-
-//TODO: otra opción, compara con la anterior:
-
-/*import bcrypt from "bcrypt";
-
-async function authorize(credentials: { email: string, password: string }) {
-  const user = await findUserByEmail(credentials.email); // Busca el usuario en la base de datos
-
-  if (user && await bcrypt.compare(credentials.password, user.hashedPassword)) {
-    return user;  // Si las contraseñas coinciden, devuelve el usuario
-  }
-  return null; // Si no coinciden, devuelve null
-}*/
+//   if (res.ok && user) {
+//     return user;
+//   } else {
+//     return null;
+//   }
+// },
+// }),
+// ],
