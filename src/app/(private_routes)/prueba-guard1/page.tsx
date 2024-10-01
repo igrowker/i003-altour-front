@@ -12,6 +12,7 @@ export default function PruebaGuard1() {
     const fetchSession = async () => {
       const res = await fetch("/api/auth/session");
       const data = await res.json();
+      console.log("data", data)
 
       if (data.user) {
         setSession(data.user); // Establece la sesión
@@ -24,6 +25,8 @@ export default function PruebaGuard1() {
     fetchSession();
   }, []);
 
+  console.log("session", session)
+  
   // Mostrar un loading mientras verificamos la sesión
   if (loading) {
     return <div>Loading...</div>;
@@ -42,7 +45,7 @@ export default function PruebaGuard1() {
     <div>
       <h1>Bienvenido a la página protegida Prueba Guard 1</h1>
       <p>Solo puedes ver esto si estás autenticado.</p>
-      <pre>{JSON.stringify(session, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(session, null, 2)}</pre> */}
     </div>
   );
 }

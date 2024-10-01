@@ -32,7 +32,7 @@ const handler = NextAuth({
       },
 
       async authorize(credentials) {
-        const loginUrl = `${process.env.API_URL}/auth/login`
+        const loginUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`
 
         if (!credentials) {
           throw new Error("Credentials are required");
@@ -42,8 +42,7 @@ const handler = NextAuth({
         try {
           // Hacer la solicitud al backend con las credenciales
           const res = await fetch(
-            //TODO: cambiar la url de abajo por la variable: loginUrl
-            "https://altour-1.onrender.com/api/v1/auth/login",
+            loginUrl,
             {
               method: "POST",
               headers: {
@@ -99,32 +98,3 @@ const handler = NextAuth({
 
 export { handler as GET, handler as POST };
 
-//Si esperamos un JSON del backend:
-// async authorize(credentials) {
-//   //const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-//   if (!credentials) {
-//     return null;
-//   }
-//   // Aquí haces la petición POST a tu backend con las credenciales
-//   const res = await fetch("https://altour-1.onrender.com/api/v1/auth/login", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       email: credentials.email,
-//       password: credentials.password,
-//     }),
-//   });
-
-//   // Si la respuesta es exitosa, obtenemos el token y los datos del usuario
-//   const user = await res.json(); // Esto falla si el servidor no devuelve JSON
-
-//   if (res.ok && user) {
-//     return user;
-//   } else {
-//     return null;
-//   }
-// },
-// }),
-// ],
