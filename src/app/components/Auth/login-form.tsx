@@ -1,4 +1,4 @@
-//TODO: Hacer llamada API está hecha desde hook useRequest.
+//TODO: En login no uso hook useRequest se gestiona desde la función de next.js singIn (configurada llamada API en route)
 
 "use client";
 
@@ -29,7 +29,7 @@ interface ErrorState {
 }
 
 export default function LoginForm() {
-  // Sesión con Google Auth
+  //recoge el estado de la sesion de next.js del usuario (si está logueado o no)
   const { data: session } = useSession();
   console.log("session", session);
 
