@@ -9,11 +9,18 @@ import Heatmap from "./components/Heatmap/Heatmap";
 import { useSession } from 'next-auth/react';
 import { useRequest } from "@/app/hooks/useRequest"
 
+interface UserData {
+  username: string; 
+ 
+}
+
+
 export default function Home() {
   const { apiFetch } = useRequest()
   const { data: session, status } = useSession();
 
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  
   let recomendaciones = [
     { id: 1, nombre: "La Sagrada Familia", descripcion: "La obra maestra inacabada de Antoni Gaudí es un icono mundial. Esta basílica, con sus torres y fachadas repletas de detalles, es una muestra impresionante del modernismo catalán. Cada rincón de la Sagrada Familia es una sorpresa visual, desde sus coloridas vidrieras hasta sus formas orgánicas inspiradas en la naturaleza)" },
     { id: 2, nombre: "Park Güell", descripcion: "Otro de los tesoros de Gaudí, el Park Güell es un parque público con un diseño extravagante y lleno de color. Sus mosaicos, bancos sinuosos y vistas panorámicas de la ciudad lo convierten en un lugar mágico para pasear y relajarse. El famoso dragón y la sala hipóstila son dos de sus puntos más destacados." },
