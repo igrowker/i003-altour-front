@@ -94,21 +94,6 @@ export default function RegisterForm() {
         },
       });
 
-      //FIXME: eliminar este objeto dataFake cuando termine las pruebas
-      const dataFake = {
-        ok: true,
-        token:
-          "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqQGouZXMiLCJpYXQiOjE3MjczNzU1OTUsImV4cCI6MTcyNzQ2MTk5NX0.L_S4RLVxMGQYZr11RcR7PHQu6ZgKK_gwC7RkKgZPKUX8yZI0GEpNX6me29cI7nmTtgzMB9-_k4vGshdJEJiouw",
-        user: {
-          username: "Doe",
-          email: "d@d.es",
-        },
-      };
-
-      if (!dataFake) {
-        //TODO: hacer lógica de mensaje en flotante o en página de error
-        return;
-      }  
 
       if (data) {
         console.log("Registro exitoso:", data);
