@@ -1,9 +1,11 @@
-"use client";
+'use client';
 
+
+import { useEffect, useState } from 'react';
 import Onboarding from '../app/components/onBoarding/onboarding';
 import { useRouter } from 'next/navigation';
 
-import { useEffect, useState } from 'react';
+
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { lusitana, waffleSoft, lato } from "@/app/ui/fonts";
@@ -18,13 +20,40 @@ interface UserData {
  
 }
 
-
 export default function Home() {
+
+  const [showOnboarding, setShowOnboarding] = useState(true);
+  const router = useRouter();
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    // Opcional: guardar en localStorage que el usuario ha completado el onboarding
+    localStorage.setItem('hasSeenOnboarding', 'true');
+  };
+
+  
+/*   useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+    if (hasSeenOnboarding) {
+      setShowOnboarding(true); //cambiar a false para que no se muestre de nuevo si el usuario ya lo ha visto
+    }
+  }, []);
+
+  
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('hasSeenOnboarding', 'true');
+    setShowOnboarding(true); //cambiar a false para que no se muestre de nuevo si el usuario ya lo ha visto
+  };
+ */
+
+
   const { apiFetch } = useRequest()
   const { data: session, status } = useSession();
 
   const [userData, setUserData] = useState<UserData | null>(null);
-  
+ 
+
   let recomendaciones = [
     { id: 1, nombre: "La Sagrada Familia", descripcion: "La obra maestra inacabada de Antoni Gaudí es un icono mundial. Esta basílica, con sus torres y fachadas repletas de detalles, es una muestra impresionante del modernismo catalán. Cada rincón de la Sagrada Familia es una sorpresa visual, desde sus coloridas vidrieras hasta sus formas orgánicas inspiradas en la naturaleza)" },
     { id: 2, nombre: "Park Güell", descripcion: "Otro de los tesoros de Gaudí, el Park Güell es un parque público con un diseño extravagante y lleno de color. Sus mosaicos, bancos sinuosos y vistas panorámicas de la ciudad lo convierten en un lugar mágico para pasear y relajarse. El famoso dragón y la sala hipóstila son dos de sus puntos más destacados." },
@@ -65,19 +94,26 @@ export default function Home() {
     }
   }, [session, status, apiFetch, userData]);
 
+  
   return (
-    <main className="flex min-h-screen flex-col p-6 pb-12 mb-7">
 
+    <>
+      {showOnboarding ? (
+        <Onboarding onComplete={handleOnboardingComplete} /> 
+      ) : (
+
+
+    <main className="flex min-h-screen flex-col p-6 pb-12 mb-7">
       <div className="flex justify-center text-3xl">
-        {userData ? <h1 className={`${waffleSoft.className}`}>Bienvenido {userData.username}</h1> : <h1 className={`${waffleSoft.className}`}>Bienvenido/a Usuario</h1>}
+        <h1 className={`${waffleSoft.className}`}>Bienvenido/a Usuario</h1>
       </div>
       <div className="flex justify-center mt-5" >
         <div className="flex justify-center items-center w-full h-full">
           <div className="w-full h-full">
-            <Heatmap
-              searchAndCard={false}
-              containerStyle={{ width: '100%', height: '200px' }}
-            />
+          <Heatmap 
+            searchAndCard={false}
+            containerStyle={{ width: '100%', height: '200px' }} 
+          />
           </div>
         </div>
       </div>
@@ -91,5 +127,7 @@ export default function Home() {
         <Carrusel slides={categorias} />
       </div>
     </main>
-  );
+  )
 }
+</>
+  );}
