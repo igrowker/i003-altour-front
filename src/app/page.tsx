@@ -94,7 +94,6 @@ export default function Home() {
     }
   }, [session, status, apiFetch, userData]);
 
-  
   return (
 
     <>
@@ -105,7 +104,7 @@ export default function Home() {
 
     <main className="flex min-h-screen flex-col p-6 pb-12 mb-7">
       <div className="flex justify-center text-3xl">
-        <h1 className={`${waffleSoft.className}`}>Bienvenido/a Usuario</h1>
+      {userData ? <h1>Bienvenido {userData.username}</h1> : <h1>Bienvenido/a Usuario</h1>}
       </div>
       <div className="flex justify-center mt-5" >
         <div className="flex justify-center items-center w-full h-full">
