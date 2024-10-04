@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { useState, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface OnboardingProps {
   onComplete: () => void;  
@@ -22,6 +23,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
       if (currentSlide < totalSlides - 1) {
         swiperRef.current.slideNext(); 
       } else {
+        console.log('Onboarding complete'); // Añade este log
         onComplete(); // Si es la última diapositiva, completamos el onboarding
       }
     }
@@ -37,6 +39,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           className="h-full bg-yellow-500 transition-all duration-300 rounded-xl shadow-sm drop-shadow-lg overflow-hidden p-1"
           style={{ width: `${progressPercentage}%` }}
         ></div>
+      {/*   <Link href="/home"><button className="mt-4 text-black  font-bold text-baseline px-4 py-2 rounded drop-shadow-lg">Omitir</button></Link> */}
       </div>
 
       <Swiper
@@ -82,7 +85,11 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             <div className="flex flex-col items-center gap-2">
               <p className="text-white text-2xl drop-shadow-[0_2px_4px_rgba(0,0,0.90,1)]">Te recomendaremos lugares menos concurridos cercanos para que disfrutes de una experiencia relajada.</p>
             </div>
-            <button onClick={handleContinue} className="mt-4 bg-yellow-500 text-black font-bold text-xl px-8 py-2 rounded drop-shadow-lg">Entrar</button>
+            <Link href="/home">
+              <button className="mt-4 bg-yellow-500 text-black font-bold text-xl px-8 py-2 rounded drop-shadow-lg">
+            Entrar
+          </button>
+          </Link>
           </div>
         </SwiperSlide>
 

@@ -28,7 +28,12 @@ interface ErrorState {
   password?: string;
 }
 
-export default function LoginForm() {
+// prop onlogin para que active el onboarding
+interface LoginFormProps {
+  onLogin: () => void;
+}
+
+export default function LoginForm({ onLogin }: LoginFormProps) {
   //recoge el estado de la sesion de next.js del usuario (si está logueado o no)
   const { data: session } = useSession();
   console.log("session", session);
@@ -78,7 +83,7 @@ export default function LoginForm() {
     console.log(result)
 
     if (result && !result.error) {
-      router.push("/"); 
+      router.push("/onboarding"); 
     } else {
       setError({ ...error, email: "Correo o contraseña inválidos" });
     }
