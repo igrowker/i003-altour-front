@@ -1,160 +1,215 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useRequest } from "@/app/hooks/useRequest";
-import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import '../../globals.css'
 
-const Preferences: React.FC = () => {
-  const [adults, setAdults] = useState<number>(2);
-  const [children, setChildren] = useState<number>(1);
-  const [pets, setPets] = useState<number>(0);
-  const [crowdLevel, setCrowdLevel] = useState<number>(50);
-  const [userData, setUserData] = useState<any>(null);
+type TransportMode = 'A pie' | 'Patinete' | 'Vehículo' | 'Bici' | 'Transporte público'
+type Preference = 'Parques y jardines' | 'Museos' | 'Monumentos' | 'Edificios históricos'
 
-  const { apiFetch, loading, error } = useRequest();
-  const { data: session, status } = useSession();
+interface UserPreferences {
+  toleranceLevel: 'Baja' | 'Media' | 'Alta'
+  searchRange: number
+  travelWithPets: boolean
+  avoidCrowds: boolean
+  visitPointsOfInterest: boolean
+  preferences: Preference[]
+  transportMode: TransportMode
+}
+
+export default function UserPreferencesPage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    toleranceLevel: 'Media',
+    searchRange: 10,
+    travelWithPets: false,
+    avoidCrowds: false,
+    visitPointsOfInterest: true,
+    preferences: [],
+    transportMode: 'A pie'
+  })
 
   useEffect(() => {
-    // Verifica que haya una sesión activa
-    if (session?.accessToken) {
-      const fetchUserData = async () => {
-        try {
-          const data = await apiFetch({
-            url: '/users/profile/',
-            method: "GET",
-            token: session.accessToken,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-          setUserData(data);
-        } catch (err) {
-          console.error("Error fetching user data:", err);
-        }
-      };
-      
-
-      fetchUserData();
+    if (status === 'authenticated' && session?.user) {
+      const user = session.user as any
+      setPreferences(prev => ({
+        ...prev,
+        toleranceLevel: user.preferredCrowdLevel <= 33 ? 'Baja' : user.preferredCrowdLevel <= 66 ? 'Media' : 'Alta',
+        searchRange: user.maxSearchDistance / 1000, // Convertir de metros a kilómetros
+      }))
     }
-  }, [session, apiFetch]);
+  }, [session, status])
 
-  if (!session) {
-    return <div>User is not authenticated</div>;
+  const handleToleranceChange = (level: 'Baja' | 'Media' | 'Alta') => {
+    setPreferences(prev => ({ ...prev, toleranceLevel: level }))
   }
-  
+
+  const handleRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPreferences(prev => ({ ...prev, searchRange: parseInt(event.target.value) }))
+  }
+
+  const handleToggle = (key: keyof UserPreferences) => {
+    setPreferences(prev => ({ ...prev, [key]: !prev[key as keyof UserPreferences] }))
+  }
+
+  const handlePreferenceToggle = (pref: Preference) => {
+    setPreferences(prev => ({
+      ...prev,
+      preferences: prev.preferences.includes(pref)
+        ? prev.preferences.filter(p => p !== pref)
+        : [...prev.preferences, pref]
+    }))
+  }
+
+  const handleTransportModeChange = (mode: TransportMode) => {
+    setPreferences(prev => ({ ...prev, transportMode: mode }))
+  }
+
+  const handleSave = async () => {
+    // Aquí deberías implementar la lógica para guardar las preferencias
+    console.log('Guardando preferencias:', preferences)
+    // Ejemplo de cómo podrías actualizar la sesión:
+    // await updateSession({
+    //   preferredCrowdLevel: preferences.toleranceLevel === 'Baja' ? 33 : preferences.toleranceLevel === 'Media' ? 66 : 100,
+    //   maxSearchDistance: preferences.searchRange * 1000,
+    // })
+    router.push('/home')
+  }
+
+  if (status === 'loading') {
+    return <div>Cargando...</div>
+  }
+
+  if (status === 'unauthenticated') {
+    router.push('/login')
+    return null
+  }
 
   return (
-    <div className="p-4 bg-gray-100 min-h-screen">
-      <h1 className="text-xl font-bold mb-4">Preferencias</h1>
-
-    </div>
-  );
-};
-
-export default Preferences;
-
-
-{/* 
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-6">Preferencias</h1>
       
-      {loading ? (
-        <p>Cargando...</p>
-      ) : error ? (
-        <p>Error: {error}</p>
-      ) : (
-        userData && <p>Usuario: {userData.name}</p> // Suponiendo que el nombre del usuario esté en `userData.name`
-      )}
+      <section className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">Ajustes generales</h2>
+        <div className="mb-4">
+          <h3 className="font-medium mb-2">Tolerancia a las multitudes</h3>
+          <div className="flex justify-between">
+            {['Baja', 'Media', 'Alta'].map((level) => (
+              <button
+                key={level}
+                onClick={() => handleToleranceChange(level as 'Baja' | 'Media' | 'Alta')}
+                className={`px-4 py-2 rounded ${preferences.toleranceLevel === level ? 'bg-rose-500 text-white' : 'bg-gray-200'}`}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mb-4">
+          <h3 className="font-medium mb-2">Rango de búsqueda</h3>
+          <input
+            type="range"
+            min="1"
+            max="30"
+            value={preferences.searchRange}
+            onChange={handleRangeChange}
+            className="w-full"
+          />
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>1 Km</span>
+            <span>{preferences.searchRange} Km</span>
+            <span>30 Km</span>
+          </div>
+        </div>
+      </section>
 
-   
-      <div>
-        <h2 className="font-semibold mb-2">Categorías (Seleccionar 1 o varias)</h2>
-        <div className="flex flex-wrap gap-2">
-          {Array.from({ length: 8 }).map((_, index) => (
+      <section className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">Otras consideraciones</h2>
+        <div className="flex items-center justify-between mb-2">
+          <span>Viajo con mascotas</span>
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={preferences.travelWithPets}
+              onChange={() => handleToggle('travelWithPets')}
+            />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">Opciones de ruta</h2>
+        <div className="flex items-center justify-between mb-2">
+          <span>Evitar aglomeraciones</span>
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={preferences.avoidCrowds}
+              onChange={() => handleToggle('avoidCrowds')}
+            />
+            <span className="slider round"></span>
+          </label>
+        </div>
+        <div className="flex items-center justify-between mb-2">
+          <span>Pasar por lugares de interés</span>
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={preferences.visitPointsOfInterest}
+              onChange={() => handleToggle('visitPointsOfInterest')}
+            />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">¿Qué te gustaría ver en el camino?</h2>
+        <div className="grid grid-cols-2 gap-2">
+          {['Parques y jardines', 'Museos', 'Monumentos', 'Edificios históricos'].map((pref) => (
             <button
-              key={index}
-              className="px-4 py-2 bg-gray-300 rounded-lg shadow-sm"
+              key={pref}
+              onClick={() => handlePreferenceToggle(pref as Preference)}
+              className={`px-4 py-2 rounded ${preferences.preferences.includes(pref as Preference) ? 'bg-rose-500 text-white' : 'bg-gray-200'}`}
             >
-              Categoría
+              {pref}
             </button>
           ))}
         </div>
-        <button className="mt-2 text-blue-500">Mostrar más</button>
-      </div>
+      </section>
 
-    
-      <div className="mt-6">
-        <h2 className="font-semibold mb-2">Multitudinómetro</h2>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={crowdLevel}
-          onChange={(e) => setCrowdLevel(Number(e.target.value))}
-          className="w-full"
-        />
-        <div className="flex justify-between text-sm text-gray-600">
-          <span>Baja</span>
-          <span>Media</span>
-          <span>Alta</span>
+      <section className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">¿Cómo te vas a desplazar?</h2>
+        <div className="grid grid-cols-3 gap-2">
+          {['A pie', 'Patinete', 'Vehículo', 'Bici', 'Transporte público'].map((mode) => (
+            <button
+              key={mode}
+              onClick={() => handleTransportModeChange(mode as TransportMode)}
+              className={`px-4 py-2 rounded ${preferences.transportMode === mode ? 'bg-rose-500 text-white' : 'bg-gray-200'}`}
+            >
+              {mode}
+            </button>
+          ))}
         </div>
+      </section>
+
+      <div className="flex justify-between">
+        <button
+          onClick={() => router.push('/home')}
+          className="px-4 py-2 bg-gray-300 rounded"
+        >
+          Restablecer
+        </button>
+        <button
+          onClick={handleSave}
+          className="px-4 py-2 bg-rose-500 text-white rounded"
+        >
+          Aplicar cambios
+        </button>
       </div>
-
-     
-      <div className="mt-6">
-        <h2 className="font-semibold mb-2">Viajeros</h2>
-        <div className="space-y-4">
-        
-          <div className="flex items-center justify-between">
-            <span>Adultos</span>
-            <div className="flex items-center space-x-2">
-              <button onClick={() => handleIncrement(setAdults)} className="px-2 py-1 bg-gray-300 rounded">
-                +
-              </button>
-              <span>{adults}</span>
-              <button onClick={() => handleDecrement(setAdults)} className="px-2 py-1 bg-gray-300 rounded">
-                -
-              </button>
-            </div>
-          </div>
-
-       
-          <div className="flex items-center justify-between">
-            <span>Niños</span>
-            <div className="flex items-center space-x-2">
-              <button onClick={() => handleIncrement(setChildren)} className="px-2 py-1 bg-gray-300 rounded">
-                +
-              </button>
-              <span>{children}</span>
-              <button onClick={() => handleDecrement(setChildren)} className="px-2 py-1 bg-gray-300 rounded">
-                -
-              </button>
-            </div>
-          </div>
-
-        
-          <div className="flex items-center justify-between">
-            <span>Mascotas</span>
-            <div className="flex items-center space-x-2">
-              <button onClick={() => handleIncrement(setPets)} className="px-2 py-1 bg-gray-300 rounded">
-                +
-              </button>
-              <span>{pets}</span>
-              <button onClick={() => handleDecrement(setPets)} className="px-2 py-1 bg-gray-300 rounded">
-                -
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-   
-      <button className="mt-6 w-full py-2 bg-gray-400 rounded text-white font-semibold">
-        Aplicar preferencias
-      </button>
-
-    
-      <div className="fixed bottom-0 w-full bg-gray-200 p-4">
-        <nav className="flex justify-around">
-          <span>Nav bar</span>
-        </nav>
-      </div>
-    </div> */}
+    </div>
+  )
+}

@@ -4,6 +4,7 @@ import { inter, lato } from "@/app/ui/fonts";
 import "./globals.css";
 import Navbar from "./components/Navbar/navbar";
 import { Providers } from "./Providers";
+import { usePathname } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Altour | Turismo sostenible',
@@ -43,7 +44,6 @@ export default function RootLayout({
     <html lang="es">
       <body className={lato.className}>
         <Providers>
-          <Navbar />
           {children}
         </Providers>
       </body>

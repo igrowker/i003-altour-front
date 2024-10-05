@@ -7,12 +7,15 @@ import { useRouter } from 'next/navigation';
 import Carrusel from "../../ui/carrousel";
 import Heatmap from "../../components/Heatmap/Heatmap";
 
+import MainLayout from '@/app/components/mainLayout';
+
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { lusitana, waffleSoft, lato } from "@/app/ui/fonts";
 import Image from "next/image";
 import { useSession } from 'next-auth/react';
 import { useRequest } from "@/app/hooks/useRequest"
+import UserPreferencesPage from '@/app/components/preferences/preferences';
 
 interface UserData {
   username: string; 
@@ -74,7 +77,7 @@ export default function Home() {
 
   return (
 
-
+    <MainLayout>
     <main className="flex min-h-screen flex-col p-6 pb-12 mb-7">
       <div className="flex justify-center text-3xl">
       {userData ? <h1>Bienvenido {userData.username}</h1> : <h1>Bienvenido/a Usuario</h1>}
@@ -97,6 +100,8 @@ export default function Home() {
       <div>
         <h2 className={`${waffleSoft.className} text-2xl pl-4 mb-2`}>Categorías</h2>
         <Carrusel slides={categorias} />
+        <UserPreferencesPage / >
       </div>
     </main>
+    </MainLayout>
   );}

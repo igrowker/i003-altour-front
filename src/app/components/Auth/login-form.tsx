@@ -13,6 +13,8 @@ import {
 import { Button } from "@/app/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+
 import { validatePass } from "@/app/lib/formValidation"; // Importa la función de validación
 //import { useRequest } from "@/app/hooks/useRequest";
 
@@ -30,10 +32,10 @@ interface ErrorState {
 
 // prop onlogin para que active el onboarding
 interface LoginFormProps {
-  onLogin: () => void;
+  
 }
 
-export default function LoginForm({ onLogin }: LoginFormProps) {
+export default function LoginForm() {
   //recoge el estado de la sesion de next.js del usuario (si está logueado o no)
   const { data: session } = useSession();
   console.log("session", session);
@@ -97,8 +99,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+    <div className="flex flex-col items-center justify-between text-center min-h-screen bg-cover p-16 bg-center bg-[url('/bggradient.png')]">
+      <div className="w-full max-w-md p-6 mt-10">
         <h2 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
 
         {error.email && <p className="text-red-500 mb-4">{error.email}</p>}
@@ -107,7 +109,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           <div className="w-full">
             <div>
               <label
-                className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+                className="mb-3 mt-5 block text-baseline font-bold text-gray-900"
                 htmlFor="email"
               >
                 Correo electrónico
@@ -132,7 +134,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
             <div className="mt-4 relative">
               <label
-                className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+                className="mb-3 mt-5 block text-baseline font-bold text-gray-900"
                 htmlFor="password"
               >
                 Contraseña
@@ -195,10 +197,12 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
             className="flex items-center justify-center w-full h-[48px] border border-gray-300 rounded-md px-4 py-2 mt-3"
             onClick={handleGoogleSignIn}
           >
-            <img
+            <Image
               src="/google-icon.svg"
               alt="Google Logo"
               className="w-5 h-5 mr-3"
+              width={22}
+              height={22}
             />
             <span className="text-gray-700 text-sm font-medium">
               Continuar con Google

@@ -12,6 +12,7 @@ import Modal from "@/app/ui/dialog-panel";
 import { validatePass } from "@/app/lib/formValidation";
 import { useRequest } from "@/app/hooks/useRequest"; // Importar el hook centralizado
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface FormData {
   username: string;
@@ -286,10 +287,12 @@ export default function RegisterForm() {
             className="flex items-center justify-center w-[328px] h-[48px] border border-gray-300 rounded-md px-4 py-2 mt-4"
             onClick={handleGoogleSignUp}
           >
-            <img
+            <Image
               src="/google-icon.svg"
               alt="Google Logo"
               className="w-5 h-5 mr-3"
+              width={22}
+              height={22}
             />
             <span className="text-gray-700 text-sm font-medium">
               Registrarme con Google{" "}
