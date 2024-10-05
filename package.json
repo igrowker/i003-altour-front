@@ -19,7 +19,8 @@
     "next-auth": "^4.24.7",
     "react": "^18",
     "react-dom": "^18",
-    "tailwind-scrollbar-hide": "^1.1.7"
+    "tailwind-scrollbar-hide": "^1.1.7",
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

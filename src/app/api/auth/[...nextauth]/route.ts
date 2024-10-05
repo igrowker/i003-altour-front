@@ -89,7 +89,7 @@ const handler = NextAuth({
       return session;
     },
   },
-  // secret: process.env.AUTH_SECRET, // Asegúrate de que AUTH_SECRET esté configurado
+  secret: process.env.NEXTAUTH_SECRET, // Asegúrate de que AUTH_SECRET esté configurado
   pages: {
     signIn: "/auth/login",
     error: "/auth/error",
