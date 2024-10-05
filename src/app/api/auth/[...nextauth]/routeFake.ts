@@ -56,6 +56,8 @@ const handler = NextAuth({
           name?: string | null;
           email?: string | null;
           image?: string | null;
+          token: string; // Add the missing token property
+          id: string; // Add the missing id property
         };
       }
       return session;
