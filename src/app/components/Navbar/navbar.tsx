@@ -8,17 +8,17 @@ import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const router = useRouter();
-  const pathname = usePathname();
-  const hideNav = pathname === "/login" || pathname === "/register";
+/*   const pathname = usePathname(); */
+/*   const hideNav = pathname === "/login" || pathname === "/register"; */
 
   const handleLogout = async () => {
     const data = await signOut({ redirect: false, callbackUrl: "/" });
     router.push(data.url); // Redirigir a la página de inicio sin recargar
   };
 
-  if (hideNav) {
+/*   if (hideNav) {
     return null;
-  }
+  } */
 
   return (
     <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 shadow-md z-10">

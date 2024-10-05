@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import { inter } from "@/app/ui/fonts";
+import { inter, lato } from "@/app/ui/fonts";
 import "./globals.css";
 import Navbar from "./components/Navbar/navbar";
 import { Providers } from "./Providers";
+import { usePathname } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Altour | Turismo sostenible',
@@ -41,9 +42,8 @@ export default function RootLayout({
  
   return (
     <html lang="es">
-      <body className={inter.className}>
+      <body className={lato.className}>
         <Providers>
-          <Navbar />
           {children}
         </Providers>
       </body>
