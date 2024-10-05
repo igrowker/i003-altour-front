@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import axios, { AxiosRequestConfig } from "axios";
 
 // Hook personalizado para centralizar peticiones
 export const useRequest = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { data: session } = useSession();
 
   // Función para realizar la petición
   const apiFetch = async ({
@@ -16,7 +18,7 @@ export const useRequest = () => {
     token = "",
     baseUrl = process.env.NEXT_PUBLIC_API_URL || "",
     sendFile = false,
-    responseBuffer = false, 
+    responseBuffer = false,
   }: {
     url: string;
     method?: "GET" | "POST" | "PUT" | "DELETE" | "RPC";
@@ -31,20 +33,27 @@ export const useRequest = () => {
     setLoading(true);
     setError(null);
 
-    const fullUrl = `${baseUrl}${url}`;
+    console.log("TOKEN", token)
     
+    const fullUrl = `${baseUrl}${url}`;
+
     // Configuración de la petición
     const config: AxiosRequestConfig = {
       headers: {
         ...headers,
-        ...(token && { Authorization: `Bearer ${token.replace("Bearer ", "")}` }),
+        ...(token && {
+          Authorization: `Bearer ${token}`,
+        }),
         ...(sendFile && { "Content-Type": "multipart/form-data" }),
       },
-      params,  // Parámetros para GET
+      params, // Parámetros para GET
       responseType: responseBuffer ? "arraybuffer" : "json",
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
     };
+
+    console.log("data", data);
+    console.log("token", token);
 
     try {
       let response;
@@ -75,8 +84,7 @@ export const useRequest = () => {
   return { apiFetch, loading, error };
 };
 
-
-//Notas 
+//Notas
 //responseBuffer = para decidir como será tratada la respuesta del servidor.
 //responseBuffer true: recibir la respuesta como un buffer binario (generalmente usado cuando esperas archivos binarios como imágenes o archivos).
 //responseBuffer false: recibir la respuesta como un objeto JSON (generalmente usado cuando esperas datos en formato JSON).

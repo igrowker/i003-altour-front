@@ -33,14 +33,13 @@ export default function PruebaGuard1() {
   }
 
   // Redirigir si no hay sesión
-  if (!session) {
     if (!session) {
         setTimeout(() => {
           router.push("/login");
         }, 3000); 
     return <div> <p>Inicia sesión para disfrutar de todo lo que te ofrece Altour.</p> </div>; 
   }
-}
+
   return (
     <div>
       <h1>Bienvenido a la página protegida Prueba Guard 1</h1>
