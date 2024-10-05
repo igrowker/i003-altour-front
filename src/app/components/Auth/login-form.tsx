@@ -39,6 +39,8 @@ export default function LoginForm() {
   //recoge el estado de la sesion de next.js del usuario (si está logueado o no)
   const { data: session } = useSession();
   console.log("session", session);
+  const sessionToken = session?.accessToken 
+  console.log("sessionToken", typeof sessionToken )
 
   //Credentials Auth en un estado
   const [formState, setFormState] = useState<FormState>({
