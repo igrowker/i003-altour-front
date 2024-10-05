@@ -7,6 +7,10 @@
 // import { useSession } from "next-auth/react";
 // import { recomendaciones, categorias } from "./lib/places-data";
 
+//import MainLayout from '@/app/components/mainLayout';
+//import UserPreferencesPage from '@/app/components/preferences/preferences';
+
+
 // export default function Home() {
 //   const { user, isLoggedIn, setToken } = useUserStore();
 //   const { data: session } = useSession();
@@ -23,6 +27,7 @@
 //   }, [session, setToken]);
 
 //   return (
+//<MainLayout>
 //     <main className="flex min-h-screen flex-col p-6 pb-12 mb-7">
 //       <div className="flex justify-center text-3xl">
 //         {isLoggedIn ? (
@@ -51,11 +56,12 @@
 //         <Carrusel slides={categorias} />
 //       </div>
 //     </main>
+// </MainLayout>
 //   );
 // }
 
-import AppFlow from './components/appFlow'
+import AppFlow from "./components/appFlow";
 
 export default function Home() {
-  return <AppFlow />
+  return <AppFlow />;
 }
