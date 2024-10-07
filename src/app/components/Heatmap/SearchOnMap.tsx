@@ -1,95 +1,144 @@
-import React, { ChangeEvent, useState } from 'react';
-import { AdjustmentsHorizontalIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import React, { useState } from "react";
+import {
+  AdjustmentsHorizontalIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
 
 interface SearchOnMapProps {
   onSearch: (term: string) => void;
   onSelectPrediction: (placeId: string) => void;
   predictions: google.maps.places.AutocompletePrediction[];
+  venueType: Array<{ venue_type: string }>;
+  activeFilters: Set<string>;
+  setActiveFilters: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-const SearchOnMap: React.FC<SearchOnMapProps> = ({ onSearch, onSelectPrediction, predictions }) => {
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+const SearchOnMap: React.FC<SearchOnMapProps> = ({
+  onSearch,
+  onSelectPrediction,
+  predictions,
+  venueType,
+  activeFilters,
+  setActiveFilters,
+}) => {
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [allCategoriesSelected, setAllCategoriesSelected] = useState(true);
 
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setSearchTerm(value);
-    onSearch(value);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    onSearch(e.target.value);
   };
 
-  const toggleFilters = () => {
-    setIsFilterVisible(!isFilterVisible);
+  const handlePredictionClick = (placeId: string) => {
+    setSearchTerm("");
+    onSelectPrediction(placeId);
   };
 
-  const applyFilter = (filter: string) => {
-    setActiveFilter(filter);
+  const handleFilterClick = (venueType: string) => {
+    const newFilters = new Set(activeFilters);
+
+    if (venueType === "Todas las categorías") {
+      if (allCategoriesSelected) {
+        return;
+      } else {
+        newFilters.clear();
+        setAllCategoriesSelected(true);
+      }
+    } else {
+      if (newFilters.has(venueType)) {
+        newFilters.delete(venueType);
+
+        if (newFilters.size === 0) {
+          setAllCategoriesSelected(true);
+        }
+      } else {
+        newFilters.add(venueType);
+        setAllCategoriesSelected(false);
+      }
+    }
+
+    setActiveFilters(newFilters);
   };
+
+  const handleButtonClick = () => {
+    router.push("/user");
+  };
+
+  const uniqueVenueTypes = Array.from(
+    new Set(venueType.map((venue) => venue.venue_type))
+  );
 
   return (
-    <div className="flex flex-col z-10 p-3 relative">
-      <div className="flex gap-3">
-        <div className="relative w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <MagnifyingGlassIcon className="w-6 h-6 text-gray-500" />
-          </div>
+    <div className="flex flex-col absolute z-10 mt-7 w-full">
+      <div className="flex gap-2 justify-center px-6">
+        <div className="w-full relative">
+          <MagnifyingGlassIcon className="absolute z-10 w-6 top-[10px] left-3" />
           <input
             type="text"
             value={searchTerm}
             onChange={handleInputChange}
-            placeholder="Busca tu destino..."
-            className="bg-gray-300 w-full h-12 rounded-3xl border border-gray-200 py-[9px] pl-11 outline-2 text-black placeholder:text-gray-500"
+            placeholder="Buscar un lugar..."
+            className={`pt-2 pb-2 pl-11 bg-slate-50 outline-none relative ${
+              searchTerm.length > 0 ? "rounded-t-3xl" : "rounded-3xl"
+            } shadow h-11 w-full`}
           />
-          {predictions.length > 0 && (
-            <ul className="absolute top-full left-0 w-full bg-white border border-gray-300 mt-1 rounded-lg shadow-lg z-20">
+          {searchTerm.length > 0 ? (
+            <ul className="absolute left-0 top-11 w-full bg-slate-50 rounded-b-3xl shadow pb-5">
               {predictions.map((prediction) => (
                 <li
                   key={prediction.place_id}
-                  onClick={() => onSelectPrediction(prediction.place_id)}
-                  className="p-2 cursor-pointer hover:bg-gray-100 text-black"
+                  onClick={() => handlePredictionClick(prediction.place_id)}
+                  className="pl-4 p-2 cursor-pointer hover:bg-slate-200 text-sm"
                 >
                   {prediction.description}
                 </li>
               ))}
             </ul>
-          )}
+          ) : null}
         </div>
+
+        {/* Botón de ajustes */}
         <button
-          onClick={toggleFilters}
-          className="w-16 h-12 bg-gray-300 rounded-full flex items-center justify-center"
+          onClick={handleButtonClick}
+          className="flex items-center text-center p-2 outline-none bg-slate-50 text-black rounded-full w-12 h-11 shadow cursor-pointer"
         >
-          <AdjustmentsHorizontalIcon className="w-6 h-6" />
+          <AdjustmentsHorizontalIcon />
         </button>
       </div>
 
-      <div
-        className={`transition-all duration-300 ease-in-out transform ${
-          isFilterVisible ? 'opacity-100 max-h-40 translate-y-0' : 'opacity-0 max-h-0 translate-y-[-20px]'
-        } overflow-hidden`}
-      >
-        <div className="relative mt-3">
-          <div className="flex gap-2 items-center overflow-x-scroll scrollbar-hide whitespace-nowrap relative touch-pan-x pl-2 pr-2">
-            <button onClick={() => applyFilter('Museos')} className="bg-gray-300 px-3 py-1 rounded-lg text-sm">
-              Museos
-            </button>
-            <button onClick={() => applyFilter('Monumentos')} className="bg-gray-300 px-3 py-1 rounded-lg text-sm">
-              Monumentos
-            </button>
-            <button onClick={() => applyFilter('Tiendas')} className="bg-gray-300 px-3 py-1 rounded-lg text-sm">
-              Tiendas
-            </button>
-            <button onClick={() => applyFilter('Restaurantes')} className="bg-gray-300 px-3 py-1 rounded-lg text-sm">
-              Restaurantes
-            </button>
-            <button onClick={() => applyFilter('Cafeterias')} className="bg-gray-300 px-3 py-1 rounded-lg text-sm">
-              Cafeterías
-            </button>
-          </div>
+      {/* Filtros de tipos de lugares */}
+      {venueType.length > 0 && (
+        <div className="flex mt-3 pl-6 overflow-x-auto scrollbar-hide h-10 gap-2 text-xs text-slate-800">
+          {/* Botón "Todas las categorías" */}
+          <button
+            onClick={() => handleFilterClick("Todas las categorías")}
+            className={`min-w-[157px] px-4 rounded-3xl bg-slate-50 outline-none whitespace-nowrap ${
+              allCategoriesSelected
+                ? "border-[#FE2A5C] border-2"
+                : "border-none"
+            }`}
+          >
+            Todas las categorías
+          </button>
 
-          <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-white pointer-events-none"></div>
-          <div className="absolute inset-y-0 right-0 w-3 bg-gradient-to-l from-white pointer-events-none"></div>
+          {/* Botones para las categorías individuales */}
+          {uniqueVenueTypes.map((venue, index) => (
+            <button
+              key={index}
+              onClick={() => handleFilterClick(venue)}
+              className={`min-w-[150px] px-4 py-2 rounded-3xl bg-slate-50 outline-none ${
+                activeFilters.has(venue)
+                  ? "border-[#FE2A5C] border-2"
+                  : "border-none"
+              }`}
+            >
+              {venue}
+            </button>
+          ))}
         </div>
-      </div>
+      )}
     </div>
   );
 };
