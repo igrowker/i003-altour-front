@@ -13,10 +13,10 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 shadow-md z-10">
+    <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 shadow-md z-20">
       <div className="flex justify-around items-center py-2 space-x-4">
         <NavLinks />
-{/* //TODO:añadir funcionalidad a "Sign Out" */}
+        {/* //TODO:añadir funcionalidad a "Sign Out" */}
         <button className="flex flex-col items-center text-gray-600 hover:text-blue-500">
           <PowerIcon className="w-6 h-6" />
           <p className="text-xs mt-1">Sign Out</p>

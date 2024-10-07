@@ -32,18 +32,17 @@ const handler = NextAuth({
       },
 
       async authorize(credentials) {
-        const loginUrl = `${process.env.API_URL}/auth/login`
+        const loginUrl = `${process.env.API_URL}/auth/login`;
 
         if (!credentials) {
           throw new Error("Credentials are required");
         }
 
-
         try {
           // Hacer la solicitud al backend con las credenciales
           const res = await fetch(
             //TODO: cambiar la url de abajo por la variable: loginUrl
-            "https://altour-1.onrender.com/api/v1/auth/login",
+            "https://altour.onrender.com/api/v1/auth/login",
             {
               method: "POST",
               headers: {
@@ -57,7 +56,7 @@ const handler = NextAuth({
           );
 
           const token = await res.text(); // Si la respuesta es solo un string
-          console.log(token)
+          console.log(token);
 
           if (!res.ok || !token) {
             throw new Error("Login failed");
@@ -82,7 +81,7 @@ const handler = NextAuth({
     },
 
     async session({ session, token }) {
-      if (typeof token.accessToken === 'string') {
+      if (typeof token.accessToken === "string") {
         session.accessToken = token.accessToken; // Pasamos el accessToken a la sesión si es string
       } else {
         session.accessToken = undefined; // Si no es un string, aseguramos que sea undefined
