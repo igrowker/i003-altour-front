@@ -39,8 +39,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
   //recoge el estado de la sesion de next.js del usuario (si está logueado o no)
   const { data: session } = useSession();
   console.log("session", session);
-  const sessionToken = session?.accessToken 
-  console.log("sessionToken", typeof sessionToken )
+  const sessionToken = session?.accessToken;
+  console.log("sessionToken", typeof sessionToken);
 
   //Credentials Auth en un estado
   const [formState, setFormState] = useState<FormState>({
@@ -84,7 +84,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
     setLoading(false);
 
-    console.log(result)
+    console.log(result);
 
     if (result && !result.error) {
       onLogin(); // Llama a la prop onLogin
@@ -92,13 +92,11 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
     } else {
       setError({ ...error, email: "Correo o contraseña inválidos" });
     }
-
-
   };
 
   // Autenticación con Google
   const handleGoogleSignIn = async () => {
-    await signIn("google", { callbackUrl: "/" });
+    await signIn("google", { callbackUrl: "/home" });
   };
 
   return (

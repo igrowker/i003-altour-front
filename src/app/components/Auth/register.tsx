@@ -42,6 +42,7 @@ export default function RegisterForm() {
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [opacity, setOpacity] = useState(0);
   const router = useRouter();
 
   const { apiFetch, loading, error: fetchError } = useRequest();
@@ -95,11 +96,10 @@ export default function RegisterForm() {
         },
       });
 
-
       if (data) {
         console.log("Registro exitoso:", data);
         //TODO: Falta mostrar mensaje de éxito antes de redirigir al usuario a la página de login
-        router.push("/login");
+        router.push("/");
         //No es necesario guardar el token en localStorage ya lo maneja NextAuth
       }
     } catch (error) {
@@ -120,8 +120,8 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+    <div className="flex flex-col items-center justify-between text-center min-h-screen bg-cover p-16 bg-center bg-[url('/bggradient.png')]">
+      <div className="w-full max-w-md p-6 mt-10">
         <h2 className="text-2xl font-bold mb-6 text-center">
           Crear una cuenta
         </h2>
@@ -129,7 +129,7 @@ export default function RegisterForm() {
           <p className="text-xs font-medium text-gray-900">
             ¿Ya tienes una cuenta?
           </p>
-          <Link key="Login" href="/login">
+          <Link key="Login" href="/">
             <p className="text-xs font-medium text-[#FE2A5C] hover:text-blue-800">
               Inicia Sesión
             </p>
@@ -138,7 +138,7 @@ export default function RegisterForm() {
 
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-sm mx-auto p-4 bg-white shadow-md rounded-lg"
+          className="space-y-3"
         >
           <div className="mb-4">
             <label
