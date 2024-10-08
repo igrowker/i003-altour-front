@@ -1,4 +1,5 @@
 import Heatmap from "@/app/components/Heatmap/Heatmap";
+import MainLayout from "@/app/components/mainLayout";
 
 export default function HeatmapPage() {
   return (

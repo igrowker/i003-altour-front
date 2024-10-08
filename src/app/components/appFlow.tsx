@@ -1,13 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import Onboarding from './onBoarding/onboarding';
-import LoginForm from './Auth/login-form';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Onboarding from "./onBoarding/onboarding";
+import LoginForm from "./Auth/login-form";
 
 const isAuthenticated = () => {
-  return typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
+  return (
+    typeof window !== "undefined" &&
+    localStorage.getItem("isAuthenticated") === "true"
+  );
 };
 
 export default function AppFlow() {
@@ -38,12 +41,12 @@ export default function AppFlow() {
 
   const handleLogin = () => {
     setIsLoggedIn(true);
-    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem("isAuthenticated", "true");
     setShowOnboarding(true); // Mostrar siempre el onboarding después de login
   };
 
   const handleOnboardingComplete = () => {
-    router.push('/home'); // Ir a home solo cuando el onboarding se complete
+    router.push("/home"); // Ir a home solo cuando el onboarding se complete
   };
 
   if (showSplash) {

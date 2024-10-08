@@ -79,10 +79,10 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
             type="text"
             value={searchTerm}
             onChange={handleInputChange}
-            placeholder="Buscar un lugar..."
+            placeholder="¿Qué quieres visitar...?"
             className={`pt-2 pb-2 pl-11 bg-slate-50 outline-none relative ${
               searchTerm.length > 0 ? "rounded-t-3xl" : "rounded-3xl"
-            } shadow h-11 w-full`}
+            } shadow-md h-11 w-full border-[1px]`}
           />
           {searchTerm.length > 0 ? (
             <ul className="absolute left-0 top-11 w-full bg-slate-50 rounded-b-3xl shadow pb-5">
@@ -102,7 +102,7 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
         {/* Botón de ajustes */}
         <button
           onClick={handleButtonClick}
-          className="flex items-center text-center p-2 outline-none bg-slate-50 text-black rounded-full w-12 h-11 shadow cursor-pointer"
+          className="flex items-center text-center p-2 outline-none bg-slate-50 text-black rounded-full w-12 h-11 shadow-md cursor-pointer"
         >
           <AdjustmentsHorizontalIcon />
         </button>
@@ -110,14 +110,14 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
 
       {/* Filtros de tipos de lugares */}
       {venueType.length > 0 && (
-        <div className="flex mt-3 pl-6 overflow-x-auto scrollbar-hide h-10 gap-2 text-xs text-slate-800">
+        <div className="flex mt-3 pl-6 overflow-x-auto scrollbar-hide h-12 py-1 gap-2 text-xs text-slate-800">
           {/* Botón "Todas las categorías" */}
           <button
             onClick={() => handleFilterClick("Todas las categorías")}
-            className={`min-w-[157px] px-4 rounded-3xl bg-slate-50 outline-none whitespace-nowrap ${
+            className={`min-w-[157px] px-4 rounded-3xl bg-slate-50 outline-none whitespace-nowrap shadow-md ${
               allCategoriesSelected
                 ? "border-[#FE2A5C] border-2"
-                : "border-none"
+                : "border-[1px]"
             }`}
           >
             Todas las categorías
@@ -128,10 +128,10 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
             <button
               key={index}
               onClick={() => handleFilterClick(venue)}
-              className={`min-w-[150px] px-4 py-2 rounded-3xl bg-slate-50 outline-none ${
+              className={`min-w-[150px] px-4 py-2 rounded-3xl bg-slate-50 outline-none shadow-md ${
                 activeFilters.has(venue)
                   ? "border-[#FE2A5C] border-2"
-                  : "border-none"
+                  : "border-[1px]"
               }`}
             >
               {venue}
