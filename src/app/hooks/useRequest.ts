@@ -33,7 +33,7 @@ export const useRequest = () => {
     setLoading(true);
     setError(null);
 
-    console.log("TOKEN", token)
+    //console.log("TOKEN", token)
     
     const fullUrl = `${baseUrl}${url}`;
 
@@ -52,8 +52,8 @@ export const useRequest = () => {
       maxContentLength: Infinity,
     };
 
-    console.log("data", data);
-    console.log("token", token);
+    //console.log("data", data);
+    //console.log("token", token);
 
     try {
       let response;

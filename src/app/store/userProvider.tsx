@@ -27,14 +27,12 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("El accessToken es undefined");
     }
 
-    console.log(token);
     //Almacenar el token en Zustand para usarlo globalmente
     setToken(token);
 
     // Si hay sesión, obtener la información del perfil del usuario
     const fetchUserProfile = async () => {
       try {
-        console.log("Access Token:", token);
         const data = await apiFetch({
           url: `/users/profile/`,
           method: "GET",
