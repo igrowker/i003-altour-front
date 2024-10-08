@@ -121,7 +121,11 @@ export default function CardMap({ placeDetails }: CardMapProps) {
               </div>
             </div>
             <div className="flex mt-3 gap-2 w-full justify-center">
+<<<<<<< HEAD
               <div className=" w-40">
+=======
+              <div className="w-40">
+>>>>>>> explore
                 <EmptyButton className="flex gap-2 justify-center">
                   Saber más
                   <svg
@@ -140,7 +144,11 @@ export default function CardMap({ placeDetails }: CardMapProps) {
                   </svg>
                 </EmptyButton>
               </div>
+<<<<<<< HEAD
               <div className=" w-40">
+=======
+              <div className="w-40">
+>>>>>>> explore
                 <Button onClick={handleNavigation}>¡Llévame!</Button>
               </div>
             </div>
