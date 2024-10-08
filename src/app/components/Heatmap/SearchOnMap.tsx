@@ -4,6 +4,7 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
+import UserPreferencesPage from "../preferences/preferences";
 
 interface SearchOnMapProps {
   onSearch: (term: string) => void;
@@ -62,9 +63,18 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
     setActiveFilters(newFilters);
   };
 
+  const [isPreferencesVisible, setIsPreferencesVisible] = useState(false);
+
   const handleButtonClick = () => {
-    router.push("/user");
+    setIsPreferencesVisible(true);
   };
+
+  const closeModal = () => {
+    setIsPreferencesVisible(false);
+  };
+ /*  const handleButtonClick = () => {
+    router.push("/user");
+  }; */
 
   const uniqueVenueTypes = Array.from(
     new Set(venueType.map((venue) => venue.venue_type))
@@ -106,6 +116,21 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
         >
           <AdjustmentsHorizontalIcon />
         </button>
+
+        {/* Modal de preferencias */}
+        {isPreferencesVisible && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-20 flex items-center justify-center">
+            <div className="bg-white rounded-lg shadow-lg p-6 relative w-3/4 max-w-lg">
+              <button
+                onClick={closeModal}
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              >
+                X
+              </button>
+              <UserPreferencesPage />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Filtros de tipos de lugares */}
