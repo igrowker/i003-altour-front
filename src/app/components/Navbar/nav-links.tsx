@@ -16,13 +16,11 @@ const logo = "/isotipo_altour.png";
 
 //TODO: User: profile/login (si está logeado / si no)
 const links = [
-  { name: "Home", href: "/", icon: logo }, // El logo es una imagen
+  { name: "Home", href: "/home", icon: logo }, // El logo es una imagen
   { name: "Search", href: "/search", icon: MagnifyingGlassIcon },
   { name: "Favorites", href: "/favorites", icon: HeartIcon }, 
-  { name: "Guard1", href: "/prueba-guard1", icon: EyeIcon },//FIXME: borrar cuando termine con pruebas guards
-  { name: "Guard2", href: "/prueba-guard2", icon: EyeIcon },//FIXME: borrar cuando termine con pruebas guards
   { name: "Map", href: "/heatmap", icon: MapIcon },
-  { name: "User", href: "/login", icon: UserIcon },
+  { name: "User", href: "/profile", icon: UserIcon },
 ];
 
 export default function NavLinks() {
