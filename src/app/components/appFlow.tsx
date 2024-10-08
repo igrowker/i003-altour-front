@@ -5,15 +5,13 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Onboarding from './onBoarding/onboarding';
 import LoginForm from './Auth/login-form';
+import { useSession } from 'next-auth/react';
 
-const isAuthenticated = () => {
-  return typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
-};
 
 export default function AppFlow() {
+  const { data: session, status } = useSession();
   const [showSplash, setShowSplash] = useState(true);
   const [opacity, setOpacity] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const router = useRouter();
 
@@ -24,26 +22,36 @@ export default function AppFlow() {
 
     const showLoginTimeout = setTimeout(() => {
       setShowSplash(false);
-      if (isAuthenticated()) {
-        setIsLoggedIn(true);
-        setShowOnboarding(true); // Mostrar el onboarding siempre después de login
+      if (status === 'authenticated') {
+        const hasSeenOnboarding = sessionStorage.getItem('hasSeenOnboarding');
+        if (!hasSeenOnboarding) {
+          setShowOnboarding(true);
+        } else {
+          router.push('/home');
+        }
       }
     }, 3000); // Reducir el tiempo de splash a 3 segundos para prueba
+
+
 
     return () => {
       clearTimeout(fadeIn);
       clearTimeout(showLoginTimeout);
     };
-  }, [router]);
+  }, [status]);
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
-    localStorage.setItem('isAuthenticated', 'true');
-    setShowOnboarding(true); // Mostrar siempre el onboarding después de login
+    const hasSeenOnboarding = sessionStorage.getItem('hasSeenOnboarding');
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    } else {
+      router.push('/home');
+    }
   };
 
   const handleOnboardingComplete = () => {
-    router.push('/home'); // Ir a home solo cuando el onboarding se complete
+    sessionStorage.setItem('hasSeenOnboarding', 'true');
+    router.push('/home');
   };
 
   if (showSplash) {
@@ -65,7 +73,7 @@ export default function AppFlow() {
     );
   }
 
-  if (!isLoggedIn) {
+  if (status !== 'authenticated') {
     return <LoginForm onLogin={handleLogin} />;
   }
 
