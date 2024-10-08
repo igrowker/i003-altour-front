@@ -23,9 +23,15 @@ export default function AppFlow() {
     const showLoginTimeout = setTimeout(() => {
       setShowSplash(false);
       if (status === 'authenticated') {
-        setShowOnboarding(true); // Mostrar el onboarding si está autenticado
+        const hasSeenOnboarding = sessionStorage.getItem('hasSeenOnboarding');
+        if (!hasSeenOnboarding) {
+          setShowOnboarding(true);
+        } else {
+          router.push('/home');
+        }
       }
     }, 3000); // Reducir el tiempo de splash a 3 segundos para prueba
+
 
 
     return () => {
@@ -35,11 +41,17 @@ export default function AppFlow() {
   }, [status]);
 
   const handleLogin = () => {
-    setShowOnboarding(true); // Mostrar siempre el onboarding después de login
+    const hasSeenOnboarding = sessionStorage.getItem('hasSeenOnboarding');
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    } else {
+      router.push('/home');
+    }
   };
 
   const handleOnboardingComplete = () => {
-    router.push('/home'); // Ir a home solo cuando el onboarding se complete
+    sessionStorage.setItem('hasSeenOnboarding', 'true');
+    router.push('/home');
   };
 
   if (showSplash) {

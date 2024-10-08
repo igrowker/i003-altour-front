@@ -10,6 +10,7 @@ import SearchOnMap from "./SearchOnMap";
 import CardMap from "./CardMap";
 import { useSession } from "next-auth/react";
 import { useRequest } from "@/app/hooks/useRequest";
+import MainLayout from "@/app/components/mainLayout";
 
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -282,6 +283,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
   }
 
   return (
+    <MainLayout>
     <div className="relative w-full">
       <LoadScript
         googleMapsApiKey={googleMapsApiKey}
@@ -394,7 +396,10 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
         </GoogleMap>
       </LoadScript>
     </div>
-  );
+    </MainLayout>
+  )
+  
+  ;
 };
 
 export default Heatmap;
