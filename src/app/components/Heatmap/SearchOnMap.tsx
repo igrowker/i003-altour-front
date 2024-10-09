@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   AdjustmentsHorizontalIcon,
-  MagnifyingGlassIcon,
+  MagnifyingGlassIcon, ArrowLeftIcon
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import UserPreferencesPage from "../preferences/preferences";
@@ -109,25 +109,31 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
           ) : null}
         </div>
 
-        {/* Botón de ajustes */}
+            {/* Botón de ajustes */}
         <button
           onClick={handleButtonClick}
-          className="flex items-center text-center p-2 outline-none bg-slate-50 text-black rounded-full w-12 h-11 shadow cursor-pointer"
+          className="flex items-center justify-center p-2 outline-none bg-slate-50 text-gray-600 rounded-full w-11 h-11 shadow cursor-pointer hover:bg-slate-100 transition-colors"
         >
-          <AdjustmentsHorizontalIcon />
+          <AdjustmentsHorizontalIcon className="w-6 h-6" />
         </button>
 
         {/* Modal de preferencias */}
         {isPreferencesVisible && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-20 flex items-center justify-center">
-            <div className="bg-white rounded-lg shadow-lg p-6 relative w-3/4 max-w-lg">
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center">
+            <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] sm:w-[90%] sm:max-w-md sm:rounded-lg shadow-lg mt-0 sm:mt-10 relative flex flex-col">
+              <div className="p-4 border-b border-gray-200 flex justify-start items-center space-x-4 bg-slate-50 rounded-lg">
               <button
-                onClick={closeModal}
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              >
-                X
-              </button>
-              <UserPreferencesPage />
+                  onClick={closeModal}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <ArrowLeftIcon className="w-6 h-6" />
+                </button>
+                <h1 className="text-xl font-bold">Preferencias</h1>
+                
+              </div>
+              <div className="flex-grow overflow-y-auto">
+                <UserPreferencesPage />
+              </div>
             </div>
           </div>
         )}

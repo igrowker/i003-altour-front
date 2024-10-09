@@ -5,6 +5,8 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useUserStore } from '../../store/userStore'
 import '../../globals.css'
+import { Shrub, Landmark, Castle, School, Bike, TramFront, CarFront, PersonStanding } from 'lucide-react';
+
 
 type TransportMode = 'A pie' | 'Patinete' | 'Vehículo' | 'Bici' | 'Transporte público'
 type Preference = 'Parques y jardines' | 'Museos' | 'Monumentos' | 'Edificios históricos'
@@ -33,6 +35,24 @@ export default function UserPreferencesPage() {
     transportMode: 'A pie'
   })
 
+  const [toleranceMessage, setToleranceMessage] = useState('')
+
+  const preferenceIcons = {
+    "Parques y jardines": Shrub,
+    "Museos": Landmark,
+    "Monumentos": School,
+    "Edificios históricos": Castle,
+  }
+
+  const travelIcons = {
+    "A pie": PersonStanding,
+    "Patinete": Bike,
+    "Vehículo": CarFront,
+    "Bici": Bike,
+    "Transporte público": TramFront,
+
+  }
+
   useEffect(() => {
     if (status === 'authenticated' && user) {
       setPreferences(prev => ({
@@ -59,6 +79,15 @@ export default function UserPreferencesPage() {
 
   const handleToleranceChange = (level: 'Baja' | 'Media' | 'Alta') => {
     setPreferences(prev => ({ ...prev, toleranceLevel: level }))
+    
+    // Actualiza el mensaje basado en el nivel de tolerancia seleccionado
+    const message = level === 'Baja'
+      ? 'Prefieres disfrutar de una experiencia tranquila donde no haya grandes grupos de personas a tu alrededor.'
+      : level === 'Media'
+      ? 'Disfrutas en sitios con una cantidad moderada de personas, donde hay algo de movimiento pero sin llegar a ser abrumador.'
+      : 'Te sientes a gusto en lugares concurridos y llenos de actividad. No te importa compartir la experiencia entre grandes grupos de personas.'
+    
+    setToleranceMessage(message)
   }
 
   const handleRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,40 +144,50 @@ export default function UserPreferencesPage() {
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-6">Preferencias</h1>
       
       <section className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Ajustes generales</h2>
+        <h2 className="text-2xl font-semibold mb-2">Ajustes generales</h2>
         <div className="mb-4">
-          <h3 className="font-medium mb-2">Tolerancia a las multitudes</h3>
+          <h3 className="font-bold text-lg">Tolerancia a las multitudes</h3>
+          <p className="text-sm p-2">Establece tu nivel de tolerancia a transitar por lugares masificados</p>
           <div className="flex justify-between">
             {['Baja', 'Media', 'Alta'].map((level) => (
               <button
                 key={level}
                 onClick={() => handleToleranceChange(level as 'Baja' | 'Media' | 'Alta')}
-                className={`px-4 py-2 rounded ${preferences.toleranceLevel === level ? 'bg-pink-500 text-white' : 'bg-gray-200'}`}
+                className={`justify-content md:px-10 px-8 py-2 rounded shadow-md ${preferences.toleranceLevel === level ? 'outline outline-2 outline-rose-500 text-rose-500' : ' outline outline-2 outline-gray-200 bg-slate-50'}`}
               >
                 {level}
               </button>
             ))}
           </div>
+
+          {/* Mostrar el mensaje de tolerancia */}
+          {toleranceMessage && (
+            <p className="mt-2 text-sm text-gray-500">{toleranceMessage}</p>
+          )}
+        
+
         </div>
         <div className="mb-4">
-          <h3 className="font-medium mb-2">Rango de búsqueda</h3>
-          <input
+        <h3 className="font-bold text-lg">Rango de búsqueda</h3>
+        <p className="text-sm p-2">Selecciona el área de distancia en el que quieres encontrar recomendaciones.</p>
+        <input
             type="range"
             min="1"
             max="30"
             value={preferences.searchRange}
             onChange={handleRangeChange}
-            className="w-full"
+            className="w-full range-input"
           />
-          <div className="flex justify-between text-sm text-gray-600">
+          <div className="flex justify-between text-sm text-gray-600 mt-2">
             <span>1 Km</span>
-            <span>{preferences.searchRange} Km</span>
+            <span className="font-bold">{preferences.searchRange < 10 ? `${preferences.searchRange}` : preferences.searchRange} Km</span>
             <span>30 Km</span>
           </div>
         </div>
+
+        
       </section>
 
       <section className="mb-6">
@@ -193,15 +232,21 @@ export default function UserPreferencesPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">¿Qué te gustaría ver en el camino?</h2>
+        <h2 className="text-lg font-semibold">¿Qué te gustaría ver en el camino?</h2>
+        <p className="text-sm p-2">Puedes seleccionar una o varias opciones</p>
         <div className="grid grid-cols-2 gap-2">
-          {['Parques y jardines', 'Museos', 'Monumentos', 'Edificios históricos'].map((pref) => (
+        {Object.entries(preferenceIcons).map(([pref, Icon]) => (
             <button
               key={pref}
               onClick={() => handlePreferenceToggle(pref as Preference)}
-              className={`px-4 py-2 rounded ${preferences.preferences.includes(pref as Preference) ? 'bg-pink-500 text-white' : 'bg-gray-200'}`}
+              className={`px-4 py-2 text-sm rounded-full shadow-md flex items-center justify-center ${
+                preferences.preferences.includes(pref as Preference)
+                  ? 'outline outline-2 outline-rose-500 text-rose-500'
+                  : 'outline outline-2 outline-gray-200 bg-white'
+              }`}
             >
-              {pref}
+              <Icon className="w-5 h-5 mr-2" />
+              <span>{pref}</span>
             </button>
           ))}
         </div>
@@ -209,29 +254,33 @@ export default function UserPreferencesPage() {
 
       <section className="mb-6">
         <h2 className="text-lg font-semibold mb-2">¿Cómo te vas a desplazar?</h2>
-        <div className="grid grid-cols-3 gap-2">
-          {['A pie', 'Patinete', 'Vehículo', 'Bici', 'Transporte público'].map((mode) => (
+        <div className="grid grid-cols-3 gap-2 whitespace-nowrap">
+        {Object.entries(travelIcons).map(([mode, Icon]) => (
             <button
               key={mode}
               onClick={() => handleTransportModeChange(mode as TransportMode)}
-              className={`px-4 py-2 rounded ${preferences.transportMode === mode ? 'bg-pink-500 text-white' : 'bg-gray-200'}`}
+              className={` px-5 mx-auto py-2 text-sm rounded-full shadow-md flex items-center justify-center ${preferences.transportMode === mode ? 'outline outline-2 outline-rose-500 text-rose-500'
+                  : 'outline outline-2 outline-gray-200 bg-white'
+              }`}
             >
-              {mode}
+              <Icon className="w-5 h-5 mr-2" />
+              <span>{mode}</span>
             </button>
           ))}
         </div>
       </section>
 
-      <div className="flex justify-between">
+
+      <div className="mt-12 flex justify-between mx-auto w-full text-xl">
         <button
           onClick={() => router.push('/home')}
-          className="px-4 py-2 bg-gray-300 rounded"
+          className="px-6 py-2 bg-white text-rose-500 outline outline-2 outline-rose-500 rounded"
         >
           Restablecer
         </button>
         <button
           onClick={handleSave}
-          className="px-4 py-2 bg-pink-500 text-white rounded"
+          className="px-6 py-2 bg-rose-500 text-white rounded"
         >
           Aplicar cambios
         </button>

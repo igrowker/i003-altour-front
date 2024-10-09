@@ -21,7 +21,7 @@ export default function Navbar() {
   } */
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 shadow-md z-20">
+    <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 shadow-md">
       <div className="flex justify-around items-center py-2 space-x-4">
         <NavLinks />
         {/* //TODO:añadir funcionalidad a "Sign Out" */}
