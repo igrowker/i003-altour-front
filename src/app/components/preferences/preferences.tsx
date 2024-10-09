@@ -35,6 +35,24 @@ export default function UserPreferencesPage() {
     transportMode: 'A pie'
   })
 
+  // PARA EDITAR EL COLOR DE FONDO DE LA BARRA SELECTORA DE DISTANCIA
+
+  const rangeInput = document.querySelector('.range-input') as HTMLInputElement | null;
+
+if (rangeInput) {
+  const updateRangeBackground = () => {
+    const value = ((rangeInput.valueAsNumber - parseInt(rangeInput.min)) / (parseInt(rangeInput.max) - parseInt(rangeInput.min))) * 100;
+    rangeInput.style.background = `linear-gradient(to right, #FE2A5C ${value}%, #e5e7eb ${value}%)`;
+  };
+
+  // Evento 'input' para actualizar el fondo
+  rangeInput.addEventListener('input', updateRangeBackground);
+
+  // Actualiza el fondo inicialmente
+  updateRangeBackground();
+}
+
+
   const [toleranceMessage, setToleranceMessage] = useState('')
 
   const preferenceIcons = {
