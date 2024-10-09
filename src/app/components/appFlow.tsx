@@ -26,7 +26,7 @@ export default function AppFlow() {
         if (!hasSeenOnboarding) {
           setShowOnboarding(true);
         } else {
-          router.push("/home");
+          router.push("/explore");
         }
       }
     }, 3000); // Reducir el tiempo de splash a 3 segundos para prueba
@@ -42,13 +42,13 @@ export default function AppFlow() {
     if (!hasSeenOnboarding) {
       setShowOnboarding(true);
     } else {
-      router.push("/home");
+      router.push("/explore");
     }
   };
 
   const handleOnboardingComplete = () => {
     sessionStorage.setItem("hasSeenOnboarding", "true");
-    router.push("/home");
+    router.push("/explore");
   };
 
   if (showSplash) {
