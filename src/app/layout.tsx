@@ -5,6 +5,9 @@ import "./globals.css";
 import Navbar from "./components/Navbar/navbar";
 import { Providers } from "./Providers";
 import { usePathname } from "next/navigation";
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+
 
 export const metadata: Metadata = {
   title: "Altour | Turismo sostenible",
@@ -42,7 +45,23 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={lato.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          {/* Contenedor de Toastify */}
+        <ToastContainer 
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
+          
+          </Providers>
       </body>
     </html>
   );

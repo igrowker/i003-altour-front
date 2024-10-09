@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useUserStore } from '../../store/userStore'
 import '../../globals.css'
 import { Shrub, Landmark, Castle, School, Bike, TramFront, CarFront, PersonStanding } from 'lucide-react';
-
+import { toast } from 'react-toastify'
 
 type TransportMode = 'A pie' | 'Patinete' | 'Vehículo' | 'Bici' | 'Transporte público'
 type Preference = 'Parques y jardines' | 'Museos' | 'Monumentos' | 'Edificios históricos'
@@ -24,7 +24,7 @@ interface UserPreferences {
 export default function UserPreferencesPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const { user, fetchUserPreferences, updateUserPreferences, updateUserProfile } = useUserStore()
+  const { user, fetchUserPreferences, updateUserProfile } = useUserStore()
   const [preferences, setPreferences] = useState<UserPreferences>({
     toleranceLevel: 'Media',
     searchRange: 10,
@@ -36,6 +36,8 @@ export default function UserPreferencesPage() {
   })
 
   const [toleranceMessage, setToleranceMessage] = useState('')
+  const [isSaving, setIsSaving] = useState(false) // Estado para deshabilitar el botón mientras se guarda
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const preferenceIcons = {
     "Parques y jardines": Shrub,
@@ -50,7 +52,6 @@ export default function UserPreferencesPage() {
     "Vehículo": CarFront,
     "Bici": Bike,
     "Transporte público": TramFront,
-
   }
 
   useEffect(() => {
@@ -111,26 +112,64 @@ export default function UserPreferencesPage() {
     setPreferences(prev => ({ ...prev, transportMode: mode }))
   }
 
-  const handleSave = async () => {
+  const handleSave = () => {
+    // Abrir la modal de confirmación
+    setIsModalOpen(true)
+  }
+
+  const confirmSave = async () => {
+    setIsModalOpen(false)
+    setIsSaving(true)
     try {
-      const updatedPreferences = preferences.preferences.map(pref => ({
-        id: user?.preferences.find((p: { venueType: string }) => p.venueType === pref)?.id || 0,
-        venueType: pref
-      }))
-      await updateUserPreferences(updatedPreferences)
-      
+      // Validaciones
+      if (preferences.searchRange < 1 || preferences.searchRange > 30) {
+        setToleranceMessage('El rango de búsqueda debe estar entre 1 y 30 Km.')
+        return
+      }
+
+      // Calcular los valores a enviar
       const crowdLevel = preferences.toleranceLevel === 'Baja' ? 33 : preferences.toleranceLevel === 'Media' ? 66 : 100
       const searchDistance = preferences.searchRange * 1000 // Convertir de km a metros
-      
-      await updateUserProfile({
+
+      // Crear el payload
+      const profileData = {
         maxSearchDistance: searchDistance,
         preferredCrowdLevel: crowdLevel,
-      })
+      }
+
+      console.log("Enviando profileData:", profileData) // Para depuración
+
+      // Enviar los datos al backend
+      await updateUserProfile(profileData)
       
-      router.push('/home')
-    } catch (error) {
+      // Mostrar el toast de éxito
+      toast.success('Datos actualizados con éxito!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      })
+
+      // Opcional: Resetear otros estados o realizar acciones adicionales
+    } catch (error: any) {
       console.error("Error saving preferences:", error)
+      if (error.response) {
+        console.error("Detalles del error:", error.response.data)
+        setToleranceMessage(`Error: ${JSON.stringify(error.response.data)}`)
+      } else {
+        setToleranceMessage('Ocurrió un error al guardar las preferencias.')
+      }
+    } finally {
+      setIsSaving(false)
     }
+  }
+
+  const cancelSave = () => {
+    setIsModalOpen(false)
   }
 
   if (status === 'loading') {
@@ -143,8 +182,32 @@ export default function UserPreferencesPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md relative">
+
+       {/* Modal de Confirmación */}
+       {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-sm">
+            <h2 className="text-xl font-semibold mb-4">Confirmación</h2>
+            <p className="mb-6">¿Estás seguro que quieres guardar tus cambios?</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={cancelSave}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmSave}
+                className="px-4 py-2 bg-rose-500 text-white rounded hover:bg-rose-600"
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    
       <section className="mb-6">
         <h2 className="text-2xl font-semibold mb-2">Ajustes generales</h2>
         <div className="mb-4">
@@ -167,27 +230,25 @@ export default function UserPreferencesPage() {
             <p className="mt-2 text-sm text-gray-500">{toleranceMessage}</p>
           )}
         
-
         </div>
         <div className="mb-4">
-        <h3 className="font-bold text-lg">Rango de búsqueda</h3>
-        <p className="text-sm p-2">Selecciona el área de distancia en el que quieres encontrar recomendaciones.</p>
-        <input
+          <h3 className="font-bold text-lg">Rango de búsqueda</h3>
+          <p className="text-sm p-2">Selecciona el área de distancia en el que quieres encontrar recomendaciones.</p>
+          <input
             type="range"
             min="1"
             max="30"
             value={preferences.searchRange}
             onChange={handleRangeChange}
+            style={{ background: `linear-gradient(to right, #FE2A5C ${(preferences.searchRange - 1) / 29 * 100}%, #e5e7eb ${(preferences.searchRange - 1) / 29 * 100}%)` }}
             className="w-full range-input"
           />
           <div className="flex justify-between text-sm text-gray-600 mt-2">
             <span>1 Km</span>
-            <span className="font-bold">{preferences.searchRange < 10 ? `${preferences.searchRange}` : preferences.searchRange} Km</span>
+            <span className="font-bold">{preferences.searchRange} Km</span>
             <span>30 Km</span>
           </div>
         </div>
-
-        
       </section>
 
       <section className="mb-6">
@@ -235,7 +296,7 @@ export default function UserPreferencesPage() {
         <h2 className="text-lg font-semibold">¿Qué te gustaría ver en el camino?</h2>
         <p className="text-sm p-2">Puedes seleccionar una o varias opciones</p>
         <div className="grid grid-cols-2 gap-2">
-        {Object.entries(preferenceIcons).map(([pref, Icon]) => (
+          {Object.entries(preferenceIcons).map(([pref, Icon]) => (
             <button
               key={pref}
               onClick={() => handlePreferenceToggle(pref as Preference)}
@@ -255,7 +316,7 @@ export default function UserPreferencesPage() {
       <section className="mb-6">
         <h2 className="text-lg font-semibold mb-2">¿Cómo te vas a desplazar?</h2>
         <div className="grid grid-cols-3 gap-2 whitespace-nowrap">
-        {Object.entries(travelIcons).map(([mode, Icon]) => (
+          {Object.entries(travelIcons).map(([mode, Icon]) => (
             <button
               key={mode}
               onClick={() => handleTransportModeChange(mode as TransportMode)}
@@ -270,7 +331,6 @@ export default function UserPreferencesPage() {
         </div>
       </section>
 
-
       <div className="mt-12 flex justify-between mx-auto w-full text-xl">
         <button
           onClick={() => router.push('/home')}
@@ -280,9 +340,10 @@ export default function UserPreferencesPage() {
         </button>
         <button
           onClick={handleSave}
-          className="px-6 py-2 bg-rose-500 text-white rounded"
+          className={`px-6 py-2 rounded ${isSaving ? 'bg-rose-300 cursor-not-allowed' : 'bg-rose-500 text-white'}`}
+          disabled={isSaving}
         >
-          Aplicar cambios
+          {isSaving ? 'Guardando...' : 'Aplicar cambios'}
         </button>
       </div>
     </div>
