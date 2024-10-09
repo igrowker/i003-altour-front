@@ -85,7 +85,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             <div className="flex flex-col items-center gap-2">
               <p className="text-white text-2xl drop-shadow-[0_2px_4px_rgba(0,0,0.90,1)]">Te recomendaremos lugares menos concurridos cercanos para que disfrutes de una experiencia relajada.</p>
             </div>
-            <Link href="/home">
+            <Link href="/explore">
               <button className="mt-4 bg-yellow-500 text-black font-bold text-xl px-8 py-2 rounded drop-shadow-lg">
             Entrar
           </button>
