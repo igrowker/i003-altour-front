@@ -10,7 +10,8 @@ import SearchOnMap from "./SearchOnMap";
 import CardMap from "./CardMap";
 import { useSession } from "next-auth/react";
 import { useRequest } from "@/app/hooks/useRequest";
-import MainLayout from "@/app/components/mainLayout";
+import MainLayout from "../mainLayout";
+import Loading from "@/app/ui/loading";
 
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -284,122 +285,123 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
 
   return (
     <MainLayout>
-    <div className="relative w-full">
-      <LoadScript
-        googleMapsApiKey={googleMapsApiKey}
-        libraries={GOOGLE_MAPS_LIBRARIES}
-      >
-        {searchAndCard && (
-          <SearchOnMap
-            onSearch={handleSearch}
-            onSelectPrediction={handleSelectPrediction}
-            predictions={predictions}
-            venueType={heatmapPoints}
-            activeFilters={activeFilters}
-            setActiveFilters={setActiveFilters}
-          />
-        )}
-
-        {heatmapPoints.length > 0 && (
-          <div
-            className={`absolute ${
-              searchAndCard ? "top-[80px]" : "top-[40px]"
-            } right-0 z-10`}
-          >
-            <CardMap placeDetails={placeDetails} />
-          </div>
-        )}
-
-        {/* Toggle visualización de Marcadores */}
-        {markers.length > 0 && (
-          <div
-            className={`absolute ${
-              searchAndCard ? "top-36" : "bottom-5"
-            } right-4 flex gap-2 items-center z-10`}
-          >
-            <span className="ml-2 text-xs pt-1 text-slate-50">Marcadores</span>
-            <label className="relative inline-flex flex-col items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only"
-                checked={showMarkers}
-                onChange={toggleMarkersVisibility}
-              />
-              <div className="w-11 h-6 bg-gray-200 rounded-full shadow-inner"></div>
-              <div
-                className={`dot absolute w-4 h-4 top-1 bg-lime-600 rounded-full shadow transform transition duration-200 ease-in-out ${
-                  showMarkers ? "-translate-x-2" : "translate-x-2 bg-red-600"
-                }`}
-              ></div>
-            </label>
-          </div>
-        )}
-
-        <GoogleMap
-          mapContainerStyle={{
-            width: containerStyle.width,
-            height: containerStyle.height,
-          }}
-          center={geolocation || { lat: 40.4167, lng: -3.7033 }}
-          zoom={geolocation ? 12 : 5}
-          onLoad={(map) => setMapInstance(map)}
-          options={{
-            disableDefaultUI: true,
-            styles: darkModeStyles,
-          }}
+      <div className="relative w-full">
+        <LoadScript
+          googleMapsApiKey={googleMapsApiKey}
+          libraries={GOOGLE_MAPS_LIBRARIES}
+          loadingElement={<Loading />}
         >
-          {/* Renderizar el mapa de calor solo si hay puntos */}
-          {heatmapPoints.length > 0 && (
-            <HeatmapLayer
-              data={heatmapPoints.map((point) => ({
-                location: point.location,
-                weight: point.weight,
-              }))}
-              options={{
-                radius: 60,
-                opacity: 0.5,
-                gradient: [
-                  "rgba(0, 255, 0, 0)",
-                  "rgba(0, 255, 0, 0.3)",
-                  "rgba(255, 255, 0, 0.3)",
-                  "rgba(255, 127, 0, 0.3)",
-                  "rgba(255, 0, 0, 0.3)",
-                ],
-              }}
+          {searchAndCard && (
+            <SearchOnMap
+              onSearch={handleSearch}
+              onSelectPrediction={handleSelectPrediction}
+              predictions={predictions}
+              venueType={heatmapPoints}
+              activeFilters={activeFilters}
+              setActiveFilters={setActiveFilters}
             />
           )}
 
-          {/* Marcador para destinos recomendados */}
-          {showMarkers &&
-            generateMarkersFromHeatmapPoints(filteredHeatmapPoints).map(
-              (marker, index) => (
-                <Marker
-                  key={index}
-                  position={marker.position}
-                  icon={"./marker.png"}
-                  onClick={() => handleMarkerClick(marker)}
+          {heatmapPoints.length > 0 && (
+            <div
+              className={`absolute ${
+                searchAndCard ? "top-[80px]" : "top-[40px]"
+              } right-0 z-10`}
+            >
+              <CardMap placeDetails={placeDetails} />
+            </div>
+          )}
+
+          {/* Toggle visualización de Marcadores */}
+          {markers.length > 0 && (
+            <div
+              className={`absolute ${
+                searchAndCard ? "top-36" : "bottom-5"
+              } right-4 flex gap-2 items-center z-10`}
+            >
+              <span className="ml-2 text-xs pt-1 text-slate-50">
+                Marcadores
+              </span>
+              <label className="relative inline-flex flex-col items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only"
+                  checked={showMarkers}
+                  onChange={toggleMarkersVisibility}
                 />
-              )
+                <div className="w-11 h-6 bg-gray-200 rounded-full shadow-inner"></div>
+                <div
+                  className={`dot absolute w-4 h-4 top-1 bg-lime-600 rounded-full shadow transform transition duration-200 ease-in-out ${
+                    showMarkers ? "-translate-x-2" : "translate-x-2 bg-red-600"
+                  }`}
+                ></div>
+              </label>
+            </div>
+          )}
+
+          <GoogleMap
+            mapContainerStyle={{
+              width: containerStyle.width,
+              height: containerStyle.height,
+            }}
+            center={geolocation || { lat: 40.4167, lng: -3.7033 }}
+            zoom={geolocation ? 12 : 5}
+            onLoad={(map) => setMapInstance(map)}
+            options={{
+              disableDefaultUI: true,
+              styles: darkModeStyles,
+            }}
+          >
+            {/* Renderizar el mapa de calor solo si hay puntos */}
+            {heatmapPoints.length > 0 && (
+              <HeatmapLayer
+                data={heatmapPoints.map((point) => ({
+                  location: point.location,
+                  weight: point.weight,
+                }))}
+                options={{
+                  radius: 60,
+                  opacity: 0.5,
+                  gradient: [
+                    "rgba(0, 255, 0, 0)",
+                    "rgba(0, 255, 0, 0.3)",
+                    "rgba(255, 255, 0, 0.3)",
+                    "rgba(255, 127, 0, 0.3)",
+                    "rgba(255, 0, 0, 0.3)",
+                  ],
+                }}
+              />
             )}
 
-          {/* Marcador para currentDestination */}
-          {currentDestination && (
-            <Marker
-              position={currentDestination}
-              icon={{
-                url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                scaledSize: new google.maps.Size(50, 50),
-              }}
-              title="Destino"
-            />
-          )}
-        </GoogleMap>
-      </LoadScript>
-    </div>
+            {/* Marcador para destinos recomendados */}
+            {showMarkers &&
+              generateMarkersFromHeatmapPoints(filteredHeatmapPoints).map(
+                (marker, index) => (
+                  <Marker
+                    key={index}
+                    position={marker.position}
+                    icon={"./marker.png"}
+                    onClick={() => handleMarkerClick(marker)}
+                  />
+                )
+              )}
+
+            {/* Marcador para currentDestination */}
+            {currentDestination && (
+              <Marker
+                position={currentDestination}
+                icon={{
+                  url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                  scaledSize: new google.maps.Size(50, 50),
+                }}
+                title="Destino"
+              />
+            )}
+          </GoogleMap>
+        </LoadScript>
+      </div>
     </MainLayout>
-  )
-  
-  ;
+  );
 };
 
 export default Heatmap;
