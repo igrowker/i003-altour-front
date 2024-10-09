@@ -1,12 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import Onboarding from './onBoarding/onboarding';
-import LoginForm from './Auth/login-form';
-import { useSession } from 'next-auth/react';
-
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Onboarding from "./onBoarding/onboarding";
+import LoginForm from "./Auth/login-form";
+import { useSession } from "next-auth/react";
 
 export default function AppFlow() {
   const { data: session, status } = useSession();
@@ -22,17 +21,15 @@ export default function AppFlow() {
 
     const showLoginTimeout = setTimeout(() => {
       setShowSplash(false);
-      if (status === 'authenticated') {
-        const hasSeenOnboarding = sessionStorage.getItem('hasSeenOnboarding');
+      if (status === "authenticated") {
+        const hasSeenOnboarding = sessionStorage.getItem("hasSeenOnboarding");
         if (!hasSeenOnboarding) {
           setShowOnboarding(true);
         } else {
-          router.push('/home');
+          router.push("/home");
         }
       }
     }, 3000); // Reducir el tiempo de splash a 3 segundos para prueba
-
-
 
     return () => {
       clearTimeout(fadeIn);
@@ -41,17 +38,17 @@ export default function AppFlow() {
   }, [status]);
 
   const handleLogin = () => {
-    const hasSeenOnboarding = sessionStorage.getItem('hasSeenOnboarding');
+    const hasSeenOnboarding = sessionStorage.getItem("hasSeenOnboarding");
     if (!hasSeenOnboarding) {
       setShowOnboarding(true);
     } else {
-      router.push('/home');
+      router.push("/home");
     }
   };
 
   const handleOnboardingComplete = () => {
-    sessionStorage.setItem('hasSeenOnboarding', 'true');
-    router.push('/home');
+    sessionStorage.setItem("hasSeenOnboarding", "true");
+    router.push("/home");
   };
 
   if (showSplash) {
@@ -73,7 +70,7 @@ export default function AppFlow() {
     );
   }
 
-  if (status !== 'authenticated') {
+  if (status !== "authenticated") {
     return <LoginForm onLogin={handleLogin} />;
   }
 

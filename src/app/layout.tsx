@@ -4,34 +4,34 @@ import { inter, lato } from "@/app/ui/fonts";
 import "./globals.css";
 import Navbar from "./components/Navbar/navbar";
 import { Providers } from "./Providers";
-import { usePathname } from 'next/navigation';
+import { usePathname } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: 'Altour | Turismo sostenible',
+  title: "Altour | Turismo sostenible",
   description:
-    'Aplicación web para recomendar lugares de interés en tiempo real en función de la afluencia de gente.',
+    "Aplicación web para recomendar lugares de interés en tiempo real en función de la afluencia de gente.",
   keywords: [
-    'afluencia',
-    'gente',
-    'ocupacion',
-    'interés',
-    'lugares',
-    'destinos',
-    'viajes',
-    'recomendaciones',
-    'recomendación',
-    'recomendar',
-    'cercano',
-    'mapa',
-    'turismo',
-    'ocio',
-    'vacaciones',
-    'viaje',
-    'viajero',
-    'turista',
+    "afluencia",
+    "gente",
+    "ocupacion",
+    "interés",
+    "lugares",
+    "destinos",
+    "viajes",
+    "recomendaciones",
+    "recomendación",
+    "recomendar",
+    "cercano",
+    "mapa",
+    "turismo",
+    "ocio",
+    "vacaciones",
+    "viaje",
+    "viajero",
+    "turista",
   ],
-  creator: 'Altour',
-  publisher: 'Altour',
+  creator: "Altour",
+  publisher: "Altour",
 };
 
 export default function RootLayout({
@@ -39,13 +39,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
- 
   return (
     <html lang="es">
       <body className={lato.className}>
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

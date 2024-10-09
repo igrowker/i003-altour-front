@@ -40,19 +40,16 @@ const handler = NextAuth({
 
         try {
           // Hacer la solicitud al backend con las credenciales
-          const res = await fetch(
-            loginUrl,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                email: credentials.email,
-                password: credentials.password,
-              }),
-            }
-          );
+          const res = await fetch(loginUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+          });
 
           const token = await res.text(); // Si la respuesta es solo un string
           console.log(token);
