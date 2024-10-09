@@ -17,7 +17,7 @@ const logo = "/isotipo_altour.png";
 //TODO: User: profile/login (si está logeado / si no)
 const links = [
   { name: "Explore", href: "/explore", icon: logo }, // El logo es una imagen
-  { name: "Search", href: "/search", icon: MagnifyingGlassIcon },
+  // { name: "Search", href: "/search", icon: MagnifyingGlassIcon },
   { name: "Favorites", href: "/favorites", icon: HeartIcon }, 
   { name: "Map", href: "/heatmap", icon: MapIcon },
   { name: "User", href: "/profile", icon: UserIcon },
