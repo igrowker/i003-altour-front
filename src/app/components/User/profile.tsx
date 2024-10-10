@@ -2,7 +2,16 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import UserPreferencesPage from "@/app/components/preferences/preferences";
+
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 export default function Profile() {
+    const router = useRouter();
+    const handleLogout = async () => {
+        const data = await signOut({ redirect: false, callbackUrl: "/" });
+        router.push(data.url); // Redirigir a la página de inicio sin recargar
+    };
     const [isPreferencesVisible, setIsPreferencesVisible] = useState(false);
 
     const handleButtonClick = () => {
@@ -21,7 +30,7 @@ export default function Profile() {
             </div>
             <div className='w-full px-5'>
                 {/* Sección de menú completa */}
-                <Link href="/Información personal">
+                <Link href="/profile">
                     <div className="w-full py-4 border-b border-[#dddddd] flex items-center px-4">
                         <div className="w-6 h-6" />
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -31,7 +40,6 @@ export default function Profile() {
                         <div className="text-[#08121e] text-base font-bold">{'>'}</div>
                     </div>
                 </Link>
-
                 <div onClick={handleButtonClick} className="w-full py-4 border-b border-[#dddddd] flex items-center px-4 cursor-pointer">
                     <div className="w-6 h-6" />
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -79,7 +87,8 @@ export default function Profile() {
                     <div className="text-[#08121e] text-base font-bold">{'>'}</div>
                 </div>
 
-                <div className="w-full py-4 border-b border-[#dddddd] flex items-center px-4">
+
+                <div className="w-full py-4 border-b border-[#dddddd] flex items-center px-4 cursor-pointer" onClick={handleLogout}>
                     <div className="w-6 h-6" />
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                         <path d="M5 21C4.45 21 3.97917 20.8042 3.5875 20.4125C3.19583 20.0208 3 19.55 3 19V5C3 4.45 3.19583 3.97917 3.5875 3.5875C3.97917 3.19583 4.45 3 5 3H12V5H5V19H12V21H5ZM16 17L14.625 15.55L17.175 13H9V11H17.175L14.625 8.45L16 7L21 12L16 17Z" fill="#08121E" />
