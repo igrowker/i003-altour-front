@@ -83,7 +83,7 @@ const Explore = () => {
         return;
       }
       const data = await apiFetch({
-        url: "destines/",
+        url: "/destines/",
         method: "GET",
         params: {
           lat: currentDestination ? currentDestination.lat : geolocation.lat,
