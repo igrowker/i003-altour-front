@@ -12,6 +12,9 @@ import { useSession } from "next-auth/react";
 import { useRequest } from "@/app/hooks/useRequest";
 import MainLayout from "../mainLayout";
 import Loading from "@/app/ui/loading";
+import { useUserStore } from "@/app/store/userStore";
+import Modal from "@/app/ui/dialog-panel";
+import { useMapStore } from "@/app/store/mapStore";
 
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -68,26 +71,29 @@ interface HeatmapProps {
 }
 
 const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
+  const { user } = useUserStore();
   const { data: session, status } = useSession();
   const [token, setToken] = useState<string>("");
-  const [geolocation, setGeolocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [ismodalOpen, setIsmodalOpen] = useState<boolean>(false);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [predictions, setPredictions] = useState<
     google.maps.places.AutocompletePrediction[]
   >([]);
-  const [currentDestination, setCurrentDestination] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const {
+    geolocation,
+    currentDestination,
+    setCurrentDestination,
+    fetchGeolocation,
+  } = useMapStore();
   const [selectedPlace, setSelectedPlace] =
     useState<google.maps.places.PlaceResult | null>(null);
   const [heatmapPoints, setHeatmapPoints] = useState<
     Array<{ location: google.maps.LatLng; weight: number; venue_type: string }>
   >([]);
   const [markers, setMarkers] = useState([]);
+  const [selectedMarkerIndex, setSelectedMarkerIndex] = useState<number | null>(
+    null
+  );
   const [placeDetails, setPlaceDetails] = useState({
     name: "",
     address: "",
@@ -115,17 +121,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
 
   // Obten la geolocalización del usuario
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setGeolocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-      },
-      (error) => {
-        console.error("Error obteniendo la ubicación:", error);
-      }
-    );
+    fetchGeolocation();
   }, []);
 
   // Cargar los datos del mapa de calor
@@ -137,17 +133,17 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
       }
 
       const data = await apiFetch({
-        url: "destines/",
+        url: "/destines/",
         method: "GET",
         params: {
           lat: currentDestination ? currentDestination.lat : geolocation.lat,
           lng: currentDestination ? currentDestination.lng : geolocation.lng,
-          maxCrowdLevel: 30,
-          maxDistance: 5000,
+          maxCrowdLevel: user?.preferredCrowdLevel,
+          maxDistance: user?.maxSearchDistance,
         },
       });
-      if (data.message) {
-        alert("No hay destinos disponibles dentro del rango establecido.");
+      if (data.message == "Request failed with status code 500") {
+        setIsmodalOpen(true);
         return;
       } else {
         setMarkers(data);
@@ -171,7 +167,13 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
     };
 
     loadHeatmapData();
-  }, [geolocation, token, currentDestination]);
+  }, [
+    geolocation,
+    token,
+    currentDestination,
+    user?.maxSearchDistance,
+    user?.preferredCrowdLevel,
+  ]);
 
   const filteredHeatmapPoints = heatmapPoints.filter(
     (point) => activeFilters.size === 0 || activeFilters.has(point.venue_type)
@@ -240,11 +242,10 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
   };
 
   // Función para manejar clic en los marcadores
-  const handleMarkerClick = (marker: {
-    position: google.maps.LatLngLiteral;
-    weight: number;
-    info: any;
-  }) => {
+  const handleMarkerClick = (
+    marker: { position: google.maps.LatLngLiteral; weight: number; info: any },
+    index: number
+  ) => {
     if (mapInstance && geolocation) {
       const markerLocation = new google.maps.LatLng(
         marker?.position?.lat,
@@ -261,6 +262,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
           centerLocation,
           markerLocation
         );
+
       setPlaceDetails({
         name: marker.info.venue_name,
         address: marker.info.venue_address,
@@ -272,6 +274,9 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
           lng: marker.position.lng,
         },
       });
+
+      // Establecer el índice del marcador seleccionado
+      setSelectedMarkerIndex(index);
     }
   };
 
@@ -286,6 +291,12 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
   return (
     <MainLayout>
       <div className="relative w-full">
+        <Modal
+          title="Alerta"
+          content="No hay recomendaciones disponibles dentro del rango establecido. Por favor, ajusta tus preferencias."
+          isOpen={ismodalOpen}
+          onClose={() => setIsmodalOpen(false)}
+        />
         <LoadScript
           googleMapsApiKey={googleMapsApiKey}
           libraries={GOOGLE_MAPS_LIBRARIES}
@@ -344,8 +355,12 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
               width: containerStyle.width,
               height: containerStyle.height,
             }}
-            center={geolocation || { lat: 40.4167, lng: -3.7033 }}
-            zoom={geolocation ? 12 : 5}
+            center={
+              currentDestination
+                ? currentDestination
+                : geolocation || { lat: 40.4167, lng: -3.7033 }
+            }
+            zoom={currentDestination || geolocation ? 15 : 5}
             onLoad={(map) => setMapInstance(map)}
             options={{
               disableDefaultUI: true,
@@ -361,7 +376,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
                 }))}
                 options={{
                   radius: 60,
-                  opacity: 0.5,
+                  opacity: 0.2,
                   gradient: [
                     "rgba(0, 255, 0, 0)",
                     "rgba(0, 255, 0, 0.3)",
@@ -380,23 +395,31 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
                   <Marker
                     key={index}
                     position={marker.position}
-                    icon={"./marker.png"}
-                    onClick={() => handleMarkerClick(marker)}
+                    icon={{
+                      url:
+                        selectedMarkerIndex === index
+                          ? "/marker2.png"
+                          : "/marker.png",
+                      scaledSize: new google.maps.Size(32, 32),
+                    }}
+                    onClick={() => handleMarkerClick(marker, index)}
                   />
                 )
               )}
 
             {/* Marcador para currentDestination */}
-            {currentDestination && (
-              <Marker
-                position={currentDestination}
-                icon={{
-                  url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                  scaledSize: new google.maps.Size(50, 50),
-                }}
-                title="Destino"
-              />
-            )}
+            {currentDestination &&
+              typeof currentDestination.lat === "number" &&
+              typeof currentDestination.lng === "number" && (
+                <Marker
+                  position={currentDestination}
+                  icon={{
+                    url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                    scaledSize: new google.maps.Size(50, 50),
+                  }}
+                  title="Destino"
+                />
+              )}
           </GoogleMap>
         </LoadScript>
       </div>
