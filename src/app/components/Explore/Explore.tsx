@@ -10,6 +10,9 @@ import { YellowButton } from "@/app/ui/button_yellow";
 import { MapIcon } from "@heroicons/react/24/outline";
 import Loading from "@/app/ui/loading";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/app/store/userStore";
+import Modal from "@/app/ui/dialog-panel";
+import { useMapStore } from "@/app/store/mapStore";
 
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -20,20 +23,21 @@ const GOOGLE_MAPS_LIBRARIES: ("visualization" | "places" | "geometry")[] = [
 ];
 
 const Explore = () => {
+  const { user } = useUserStore();
   const { data: session, status } = useSession();
   const [token, setToken] = useState<string>("");
-  const [geolocation, setGeolocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [ismodalOpen, setIsmodalOpen] = useState<boolean>(false);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [predictions, setPredictions] = useState<
     google.maps.places.AutocompletePrediction[]
   >([]);
-  const [currentDestination, setCurrentDestination] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const {
+    geolocation,
+    currentDestination,
+    setCurrentDestination,
+    fetchGeolocation,
+  } = useMapStore();
+
   const [selectedPlace, setSelectedPlace] =
     useState<google.maps.places.PlaceResult | null>(null);
   const [recommendations, setRecommendations] = useState<
@@ -64,17 +68,7 @@ const Explore = () => {
 
   // Obten la geolocalización del usuario
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setGeolocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-      },
-      (error) => {
-        console.error("Error obteniendo la ubicación:", error);
-      }
-    );
+    fetchGeolocation();
   }, []);
 
   useEffect(() => {
@@ -88,23 +82,38 @@ const Explore = () => {
         params: {
           lat: currentDestination ? currentDestination.lat : geolocation.lat,
           lng: currentDestination ? currentDestination.lng : geolocation.lng,
-          maxCrowdLevel: 30,
-          maxDistance: 5000,
+          maxCrowdLevel: user?.preferredCrowdLevel,
+          maxDistance: user?.maxSearchDistance,
         },
       });
-      if (data.message) {
-        alert("No hay destinos disponibles dentro del rango establecido.");
+      if (data.message === "Request failed with status code 500") {
+        setIsmodalOpen(true);
         return;
       } else {
         setRecommendations(data);
       }
     };
     recomendations();
-  }, [geolocation, token, currentDestination]);
+  }, [
+    geolocation,
+    token,
+    currentDestination,
+    user?.maxSearchDistance,
+    user?.preferredCrowdLevel,
+  ]);
 
   const filteredHeatmapPoints = recommendations.filter(
     (point) => activeFilters.size === 0 || activeFilters.has(point.venue_type)
   );
+
+  // filteredHeatmapPoints ordenado por day_raw y rating
+  const sortedHeatmapPoints = [...filteredHeatmapPoints].sort((a, b) => {
+    const dayRawComparison = a.day_raw[0] - b.day_raw[0];
+    if (dayRawComparison !== 0) {
+      return dayRawComparison;
+    }
+    return (b.rating || 0) - (a.rating || 0);
+  });
 
   // Buscar lugares en el mapa
   const handleSearch = (term: string) => {
@@ -189,6 +198,12 @@ const Explore = () => {
   return (
     <MainLayout>
       <div className="relative w-full">
+        <Modal
+          title="Alerta"
+          content="No hay recomendaciones disponibles dentro del rango establecido. Por favor, ajusta tus preferencias."
+          isOpen={ismodalOpen}
+          onClose={() => setIsmodalOpen(false)}
+        />
         {recommendations.length > 0 && (
           <YellowButton
             className="fixed justify-center flex bottom-[90px] w-[176] cursor-pointer shadow-md left-1/2 transform -translate-x-1/2 z-20"
@@ -206,11 +221,6 @@ const Explore = () => {
           activeFilters={activeFilters}
           setActiveFilters={setActiveFilters}
         />
-        {recommendations.length === 0 && (
-          <div className="flex justify-center items-center h-96">
-            <p className="text-lg text-slate-700">No hay recomendaciones</p>
-          </div>
-        )}
         {recommendations.length > 0 && (
           <div className="flex w-full flex-col pt-36 px-4 gap-4 pb-24">
             <div>
@@ -223,7 +233,7 @@ const Explore = () => {
                 </>
               )}
             </div>
-            {filteredHeatmapPoints.map((recommendation, index) => {
+            {sortedHeatmapPoints.map((recommendation, index) => {
               const distance = calculateDistance({
                 lat: recommendation.venue_lat,
                 lng: recommendation.venue_lng,
@@ -239,13 +249,13 @@ const Explore = () => {
                       xmlns="http://www.w3.org/2000/svg"
                       fill="black"
                       viewBox="0 0 24 24"
-                      stroke-width="2"
+                      strokeWidth="2"
                       stroke="white"
                       className="w-7 h-7 cursor-pointer"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
                       />
                     </svg>
@@ -308,7 +318,7 @@ const Explore = () => {
                           />
                         </svg>
                         <p className="text-base">
-                          {recommendation.rating.toFixed(1)}
+                          {recommendation.rating?.toFixed(1)}
                         </p>
                       </div>
                     </div>
@@ -318,7 +328,6 @@ const Explore = () => {
             })}
           </div>
         )}
-
         {/* Script Google Maps */}
         <LoadScript
           googleMapsApiKey={googleMapsApiKey}
