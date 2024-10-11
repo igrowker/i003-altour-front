@@ -39,19 +39,22 @@ interface UserPreferences {
   transportMode: TransportMode;
 }
 
+// Definir las preferencias iniciales
+const initialPreferences: UserPreferences = {
+  toleranceLevel: "Media",
+  searchRange: 5, 
+  travelWithPets: false,
+  avoidCrowds: false,
+  visitPointsOfInterest: true,
+  preferences: [],
+  transportMode: "A pie",
+};
+
 export default function UserPreferencesPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { user, fetchUserPreferences, updateUserProfile } = useUserStore();
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    toleranceLevel: "Media",
-    searchRange: 10,
-    travelWithPets: false,
-    avoidCrowds: false,
-    visitPointsOfInterest: true,
-    preferences: [],
-    transportMode: "A pie",
-  });
+  const [preferences, setPreferences] = useState<UserPreferences>(initialPreferences);
 
   const [toleranceMessage, setToleranceMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false); // Estado para deshabilitar el botón mientras se guarda
@@ -180,9 +183,9 @@ export default function UserPreferencesPage() {
       await updateUserProfile(profileData);
 
       // Mostrar el toast de éxito
-      toast.success("Datos actualizados con éxito!", {
+      toast.success("Preferencias actualizadas con éxito", {
         position: "top-right",
-        autoClose: 5000,
+        autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -207,6 +210,22 @@ export default function UserPreferencesPage() {
 
   const cancelSave = () => {
     setIsModalOpen(false);
+  };
+
+
+  const handleReset = () => {
+    setPreferences(initialPreferences);
+    setToleranceMessage(""); // Limpiar mensajes si es necesario
+    toast.info("Preferencias restablecidas a valores predeterminados", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
   };
 
   if (status === "loading") {
@@ -391,7 +410,7 @@ export default function UserPreferencesPage() {
 
       <div className="mt-12 flex justify-between mx-auto w-full text-xl">
         <button
-          onClick={() => router.push("/home")}
+          onClick={handleReset}
           className="px-6 py-2 bg-white text-rose-500 outline outline-2 outline-rose-500 rounded"
         >
           Restablecer
