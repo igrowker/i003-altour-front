@@ -10,7 +10,6 @@ import SearchOnMap from "./SearchOnMap";
 import CardMap from "./CardMap";
 import { useSession } from "next-auth/react";
 import { useRequest } from "@/app/hooks/useRequest";
-import MainLayout from "../mainLayout";
 import Loading from "@/app/ui/loading";
 import { useUserStore } from "@/app/store/userStore";
 import Modal from "@/app/ui/dialog-panel";
@@ -127,7 +126,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
   // Cargar los datos del mapa de calor
   useEffect(() => {
     const loadHeatmapData = async () => {
-      if (!geolocation || !token) {
+      if (!geolocation || !token || !user?.maxSearchDistance) {
         setMarkers([]);
         return;
       }
@@ -288,66 +287,66 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
     return <div>Error: Google Maps API key is missing</div>;
   }
 
+  if (!user?.preferredCrowdLevel && !user?.maxSearchDistance) {
+    return;
+  }
+
   return (
-    <MainLayout>
-      <div className="relative w-full">
-        <Modal
-          title="Alerta"
-          content="No hay recomendaciones disponibles dentro del rango establecido. Por favor, ajusta tus preferencias."
-          isOpen={ismodalOpen}
-          onClose={() => setIsmodalOpen(false)}
+    <div className="relative w-full">
+      <Modal
+        title="Alerta"
+        content="No hay recomendaciones disponibles dentro del rango establecido. Por favor, ajusta tus preferencias."
+        isOpen={ismodalOpen}
+        onClose={() => setIsmodalOpen(false)}
+      />
+      {searchAndCard && (
+        <SearchOnMap
+          onSearch={handleSearch}
+          onSelectPrediction={handleSelectPrediction}
+          predictions={predictions}
+          venueType={heatmapPoints}
+          activeFilters={activeFilters}
+          setActiveFilters={setActiveFilters}
         />
+      )}
+
+      {/* Toggle visualización de Marcadores */}
+      {markers.length > 0 && (
+        <div
+          className={`absolute ${
+            searchAndCard ? "top-36" : "bottom-5"
+          } right-4 flex gap-2 items-center`}
+        >
+          <span className="ml-2 text-xs pt-1 text-slate-50">Marcadores</span>
+          <label className="relative inline-flex flex-col items-center cursor-pointer">
+            <input
+              type="checkbox"
+              className="sr-only"
+              checked={showMarkers}
+              onChange={toggleMarkersVisibility}
+            />
+            <div className="w-11 h-6 bg-gray-200 rounded-full shadow-inner"></div>
+            <div
+              className={`dot absolute w-4 h-4 top-1 bg-lime-600 rounded-full shadow transform transition duration-200 ease-in-out ${
+                showMarkers ? "-translate-x-2" : "translate-x-2 bg-red-600"
+              }`}
+            ></div>
+          </label>
+        </div>
+      )}
+
+      <div>
         <LoadScript
           googleMapsApiKey={googleMapsApiKey}
           libraries={GOOGLE_MAPS_LIBRARIES}
           loadingElement={<Loading />}
         >
-          {searchAndCard && (
-            <SearchOnMap
-              onSearch={handleSearch}
-              onSelectPrediction={handleSelectPrediction}
-              predictions={predictions}
-              venueType={heatmapPoints}
-              activeFilters={activeFilters}
-              setActiveFilters={setActiveFilters}
-            />
-          )}
-
           {heatmapPoints.length > 0 && (
             <div
               className={`absolute ${
                 searchAndCard ? "top-[80px]" : "top-[40px]"
-              } right-0 z-10`}
-            >
-              <CardMap placeDetails={placeDetails} />
-            </div>
-          )}
-
-          {/* Toggle visualización de Marcadores */}
-          {markers.length > 0 && (
-            <div
-              className={`absolute ${
-                searchAndCard ? "top-36" : "bottom-5"
-              } right-4 flex gap-2 items-center z-10`}
-            >
-              <span className="ml-2 text-xs pt-1 text-slate-50">
-                Marcadores
-              </span>
-              <label className="relative inline-flex flex-col items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  checked={showMarkers}
-                  onChange={toggleMarkersVisibility}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full shadow-inner"></div>
-                <div
-                  className={`dot absolute w-4 h-4 top-1 bg-lime-600 rounded-full shadow transform transition duration-200 ease-in-out ${
-                    showMarkers ? "-translate-x-2" : "translate-x-2 bg-red-600"
-                  }`}
-                ></div>
-              </label>
-            </div>
+              } right-0`}
+            ></div>
           )}
 
           <GoogleMap
@@ -372,7 +371,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
               <HeatmapLayer
                 data={heatmapPoints.map((point) => ({
                   location: point.location,
-                  weight: point.weight,
+                  weight: point.weight || 0,
                 }))}
                 options={{
                   radius: 60,
@@ -423,7 +422,8 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
           </GoogleMap>
         </LoadScript>
       </div>
-    </MainLayout>
+      <CardMap placeDetails={placeDetails} />
+    </div>
   );
 };
 

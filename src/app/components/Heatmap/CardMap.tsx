@@ -93,7 +93,9 @@ export default function CardMap({ placeDetails }: CardMapProps) {
                       : "text-red-700"
                   }`}
                 >
-                  {placeDetails.weight <= 10
+                  {!placeDetails.weight
+                    ? "No hay información de afluencia"
+                    : placeDetails.weight <= 10
                     ? "Muy poco transitado"
                     : placeDetails.weight <= 30
                     ? "Poco transitado"
@@ -108,7 +110,7 @@ export default function CardMap({ placeDetails }: CardMapProps) {
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
-                  fill="#F7CE17"
+                  fill={!placeDetails.rating ? "grey" : "#F7CE17"}
                   className="size-6"
                 >
                   <path
@@ -117,7 +119,11 @@ export default function CardMap({ placeDetails }: CardMapProps) {
                     clipRule="evenodd"
                   />
                 </svg>
-                <p className="text-base">{placeDetails.rating.toFixed(1)}</p>
+                <p className="text-base">
+                  {placeDetails.rating === null
+                    ? "0.0"
+                    : placeDetails.rating.toFixed(1)}
+                </p>
               </div>
             </div>
             <div className="flex mt-3 gap-2 w-full justify-center">

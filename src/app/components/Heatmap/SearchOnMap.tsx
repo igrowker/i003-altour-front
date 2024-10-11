@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import {
   AdjustmentsHorizontalIcon,
-  MagnifyingGlassIcon, ArrowLeftIcon
+  MagnifyingGlassIcon,
+  ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import UserPreferencesPage from "../preferences/preferences";
@@ -72,27 +73,27 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
   const closeModal = () => {
     setIsPreferencesVisible(false);
   };
- /*  const handleButtonClick = () => {
-    router.push("/user");
-  }; */
 
   const uniqueVenueTypes = Array.from(
     new Set(venueType.map((venue) => venue.venue_type))
   );
 
   return (
-    <div className="flex flex-col absolute z-10 mt-7 w-full">
+    <div className="flex flex-col absolute mt-7 w-full z-[1]">
       <div className="flex gap-2 justify-center px-6">
-        <div className="w-full relative">
-          <MagnifyingGlassIcon className="absolute z-10 w-6 top-[10px] left-3" />
+        <div className="w-full relative max-w-xs">
+          <div className="absolute inset-y-5 left-0 flex items-center pl-3">
+            <MagnifyingGlassIcon className="h-5 w-5 text-slate-900" />
+          </div>
           <input
             type="text"
             value={searchTerm}
             onChange={handleInputChange}
-            placeholder="¿Qué quieres visitar...?"
-            className={`pt-2 pb-2 pl-11 bg-slate-50 outline-none relative ${
+            className={`${
               searchTerm.length > 0 ? "rounded-t-3xl" : "rounded-3xl"
-            } shadow-md h-11 w-full border-[1px]`}
+            }
+            w-full pl-10 pr-4 h-full py-2 border-[1px] shadow-md outline-none`}
+            placeholder="¿Qué quieres visitar...?"
           />
           {searchTerm.length > 0 ? (
             <ul className="absolute left-0 top-11 w-full bg-slate-50 rounded-b-3xl shadow pb-5">
@@ -109,7 +110,7 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
           ) : null}
         </div>
 
-            {/* Botón de ajustes */}
+        {/* Botón de ajustes */}
         <button
           onClick={handleButtonClick}
           className="flex items-center text-center p-2 outline-none bg-slate-50 text-black rounded-full w-12 h-11 shadow-md cursor-pointer"
@@ -119,17 +120,16 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
 
         {/* Modal de preferencias */}
         {isPreferencesVisible && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center">
             <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] sm:w-[90%] sm:max-w-md sm:rounded-lg shadow-lg mt-0 sm:mt-10 relative flex flex-col">
               <div className="p-4 border-b border-gray-200 flex justify-start items-center space-x-4 bg-slate-50 rounded-lg">
-              <button
+                <button
                   onClick={closeModal}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <ArrowLeftIcon className="w-6 h-6" />
                 </button>
                 <h1 className="text-xl font-bold">Preferencias</h1>
-                
               </div>
               <div className="flex-grow overflow-y-auto">
                 <UserPreferencesPage />
