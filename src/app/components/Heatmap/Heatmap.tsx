@@ -145,6 +145,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
         setIsmodalOpen(true);
         return;
       } else {
+        setIsmodalOpen(false);
         setMarkers(data);
       }
 
@@ -375,7 +376,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
                 }))}
                 options={{
                   radius: 60,
-                  opacity: 0.2,
+                  opacity: 0.3,
                   gradient: [
                     "rgba(0, 255, 0, 0)",
                     "rgba(0, 255, 0, 0.3)",
@@ -389,6 +390,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
 
             {/* Marcador para destinos recomendados */}
             {showMarkers &&
+              mapInstance &&
               generateMarkersFromHeatmapPoints(filteredHeatmapPoints).map(
                 (marker, index) => (
                   <Marker
@@ -408,6 +410,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ searchAndCard, containerStyle }) => {
 
             {/* Marcador para currentDestination */}
             {currentDestination &&
+              mapInstance &&
               typeof currentDestination.lat === "number" &&
               typeof currentDestination.lng === "number" && (
                 <Marker

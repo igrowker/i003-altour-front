@@ -30,7 +30,7 @@ export default function Navbar() {
           className="flex flex-col items-center text-gray-600 hover:text-blue-500"
         >
           <PowerIcon className="w-6 h-6" />
-          <p className="text-xs mt-1">Sign Out</p>
+          <p className="text-xs mt-1">Cerrar sesión</p>
         </button>
       </div>
     </nav>

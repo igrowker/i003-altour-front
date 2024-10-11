@@ -4,7 +4,6 @@ import {
   MagnifyingGlassIcon,
   ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
 import UserPreferencesPage from "../preferences/preferences";
 
 interface SearchOnMapProps {
@@ -16,6 +15,118 @@ interface SearchOnMapProps {
   setActiveFilters: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
+const filterEquivalences: { [key: string]: string } = {
+  RESTAURANT: "Restaurantes",
+  SHOPPING: "Compras",
+  FAST_FOOD: "Comida Rápida",
+  BAR: "Bares",
+  SUPERMARKET: "Supermercados",
+  GROCERY: "Tiendas de Abarrotes",
+  PARK: "Parques",
+  OTHER: "Otros",
+  APPAREL: "Tiendas de Ropa",
+  FOOD_AND_DRINK: "Comida y Bebida",
+  CAFE: "Cafés",
+  SHOPPING_CENTER: "Centros Comerciales",
+  COFFEE: "Cafeterías",
+  AIRPORT: "Aeropuertos",
+  SPORTS_COMPLEX: "Complejos Deportivos",
+  PHARMACY: "Farmacias",
+  PERSONAL_CARE: "Cuidado Personal",
+  VEHICLE: "Vehículos",
+  GAS_STATION: "Gasolineras",
+  MUSEUM: "Museos",
+  DENTIST: "Dentistas",
+  LIBRARY: "Bibliotecas",
+  BANKING: "Bancos",
+  TOURIST_DESTINATION: "Destinos Turísticos",
+  CASH_MACHINE: "Cajeros Automáticos",
+  FOOD_DELIVERY: "Entrega de Comida",
+  EVENT_VENUE: "Lugares de Eventos",
+  SPA: "Spas",
+  MARKET: "Supermercados",
+  CLUBS: "Clubs",
+  PUBLIC_TRANSIT: "Transporte Público",
+  BREWERY: "Cervecerías",
+  SPORTING_GOODS: "Artículos Deportivos",
+  HISTORICAL: "Históricos",
+  PERFORMING_ARTS: "Artes Escénicas",
+  DOCTOR: "Médicos",
+  AMUSEMENT_PARK: "Parques de Atracciones",
+  GIFTS: "Tiendas de regalos",
+  TEA: "Teterías",
+  CHURCH: "Iglesias",
+  SKILL_INSTRUCTION: "Instrucción de Habilidades",
+  TRAIN_STATION: "Estaciones de Tren",
+  ARTS: "Artes",
+  GOLF: "Golf",
+  ZOO: "Zoológicos",
+  BOTANICAL_GARDEN: "Jardines Botánicos",
+  NATIONAL_PARK: "Parques Nacionales",
+  SUBWAY_STATION: "Estaciones de Metro",
+  CASINO: "Casinos",
+  MOVIE_THEATER: "Cines",
+  POST_OFFICE: "Oficinas de Correos",
+  HIKING: "Senderismo",
+  GOLF_COURSE: "Campos de Golf",
+  NATURE_RESERVE: "Reservas Naturales",
+  BRIDGE: "Puentes",
+  BUS_STATION: "Estaciones de Autobuses",
+  GOVERNMENT: "Gobierno",
+  REST_AREA: "Áreas de Descanso",
+  WINERY: "Bodegas",
+  SCENIC_POINT: "Puntos Escénicos",
+  SOUVENIR_SHOP: "Tiendas de Souvenirs",
+  CITY_HALL: "Ayuntamientos",
+  BOATING: "Navegación",
+  CONCERT_HALL: "Salas de Conciertos",
+  SWIMMING: "Piscinas",
+  MONUMENT: "Monumentos",
+  SOCCER: "Fútbol",
+  CAR_RENTAL: "Alquiler de Autos",
+  MOSQUE: "Mezquitas",
+  INDUSTRIAL: "Industrial",
+  VISITOR_CENTER: "Centros de Visitantes",
+  ANTIQUES: "Antigüedades",
+  AQUARIUM: "Acuarios",
+  PALACE: "Palacios",
+  HINDU_TEMPLE: "Templos Hindúes",
+  STADIUM: "Estadios",
+  WINTER_SPORTS: "Deportes de Invierno",
+  BUDDHIST_TEMPLE: "Templos Budistas",
+  EMBASSY: "Embajadas",
+  TEMPLE: "Templos",
+  TENNIS: "Tenis",
+  BASEBALL: "Béisbol",
+  FERRY_TERMINAL: "Terminales de Ferry",
+  FISHING: "Pesca",
+  POLICE: "Policía",
+  SCHOOL: "Escuelas",
+  BAKERY: "Panaderías",
+  AGRICULTURE: "Agricultura",
+  CRICKET: "Cricket",
+  FAIRGROUNDS: "Ferias",
+  GONDOLA_LIFT_STATION: "Estaciones de Teleférico",
+  HOSPITAL: "Hospitales",
+  LIGHTHOUSE: "Faros",
+  MILITARY: "Cuarteles militares",
+  MORMON_TEMPLE: "Templos Mormones",
+  UNIVERSITY: "Universidades",
+  BURGER_RESTAURANT: "Hamburgueserías",
+  BEER: "Cervecerías",
+  MEDITERANEAN_RESTAURANT: "Restaurantes Mediterráneos",
+  CHINESE_RESTAURANT: "Restaurantes Chinos",
+  SEAFOOD_RESTAURANT: "Marisquerías",
+  PIZZA_RESTAURANT: "Pizzerías",
+  AMERICAN_RESTAURANT: "Restaurantes Americanos",
+  MEXICAN_RESTAURANT: "Restaurantes Mexicanos",
+  JAPANESE_RESTAURANT: "Restaurantes Japoneses",
+  VEGETERIAN_RESTAURANT: "Restaurantes Vegetarianos",
+  ITALIAN_RESTAURANT: "Restaurantes Italianos",
+  BREAKFAST_RESTAURANT: "Restaurantes de Desayuno",
+  SANDWICH_RESTAURANT: "Restaurantes de Sándwiches",
+};
+
 const SearchOnMap: React.FC<SearchOnMapProps> = ({
   onSearch,
   onSelectPrediction,
@@ -24,7 +135,6 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
   activeFilters,
   setActiveFilters,
 }) => {
-  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [allCategoriesSelected, setAllCategoriesSelected] = useState(true);
 
@@ -155,19 +265,24 @@ const SearchOnMap: React.FC<SearchOnMapProps> = ({
           </button>
 
           {/* Botones para las categorías individuales */}
-          {uniqueVenueTypes.map((venue, index) => (
-            <button
-              key={index}
-              onClick={() => handleFilterClick(venue)}
-              className={`min-w-[150px] px-4 py-2 rounded-3xl bg-slate-50 outline-none shadow-md ${
-                activeFilters.has(venue)
-                  ? "border-[#FE2A5C] border-2"
-                  : "border-[1px]"
-              }`}
-            >
-              {venue}
-            </button>
-          ))}
+          {uniqueVenueTypes.map((venue, index) => {
+            const displayName =
+              filterEquivalences[venue as keyof typeof filterEquivalences] ||
+              venue; // Usa la equivalencia o deja el original
+            return (
+              <button
+                key={index}
+                onClick={() => handleFilterClick(venue)}
+                className={`min-w-[150px] px-4 rounded-3xl bg-slate-50 outline-none shadow-md ${
+                  activeFilters.has(venue)
+                    ? "border-[#FE2A5C] border-2"
+                    : "border-[1px]"
+                }`}
+              >
+                {displayName}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

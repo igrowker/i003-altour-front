@@ -36,6 +36,7 @@ const Explore = () => {
     setCurrentDestination,
     fetchGeolocation,
   } = useMapStore();
+  const [favoriteVenues, setFavoriteVenues] = useState<Set<number>>(new Set());
 
   const [selectedPlace, setSelectedPlace] =
     useState<google.maps.places.PlaceResult | null>(null);
@@ -90,6 +91,7 @@ const Explore = () => {
         return;
       } else {
         setRecommendations(data);
+        setIsmodalOpen(false);
       }
     };
     recomendations();
@@ -192,6 +194,19 @@ const Explore = () => {
 
   const handleViewMap = () => {
     router.push("/heatmap");
+  };
+
+  // Activación de favoritos
+  const toggleFavorite = (venueId: number) => {
+    setFavoriteVenues((prev) => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(venueId)) {
+        newFavorites.delete(venueId);
+      } else {
+        newFavorites.add(venueId);
+      }
+      return newFavorites;
+    });
   };
 
   return (
@@ -304,22 +319,24 @@ const Explore = () => {
                     </p>
                   </div>
                   <div className="flex justify-between p-2">
-                    <div className="flex gap-1 p-1">
+                    <div
+                      className="absolute top-4 right-4"
+                      onClick={() => toggleFavorite(index)}
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
+                        fill={favoriteVenues.has(index) ? "red" : "black"}
                         viewBox="0 0 24 24"
-                        fill={recommendation.rating ? "#F7CE17" : "gray"}
-                        className="size-6"
+                        strokeWidth="2"
+                        stroke="white"
+                        className="w-7 h-7 cursor-pointer"
                       >
                         <path
-                          fillRule="evenodd"
-                          d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
-                          clipRule="evenodd"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
                         />
                       </svg>
-                      <p className="text-base">
-                        {recommendation.rating?.toFixed(1) || "0.0"}
-                      </p>
                     </div>
                   </div>
                 </div>
