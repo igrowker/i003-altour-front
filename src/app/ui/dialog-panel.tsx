@@ -8,7 +8,12 @@ interface ModalProps {
   onClose: () => void; // Función para cerrar el modal
 }
 
-export default function Modal({ title = "Título", content = "Contenido", isOpen, onClose }: ModalProps) {
+export default function Modal({
+  title = "Título",
+  content = "Contenido",
+  isOpen,
+  onClose,
+}: ModalProps) {
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <div className="fixed inset-0 bg-black bg-opacity-25" />
