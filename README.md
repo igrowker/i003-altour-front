@@ -92,27 +92,27 @@ npm run dev
 ## 👥 Equipo
 
 ### Project Manager:
-- **Christian Gil**
+- **Christian Gil** [Linkedin](https://www.linkedin.com/in/christiangil72/)
 
 ### Frontend:
-- **Yolanda Lopez Vidal**
-- **Melody Callejas Nuñez**
-- **Jonathan Muñoz**
-- **Sebastian Barrientos**
+- **Yolanda Lopez Vidal** [Linkedin](https://www.linkedin.com/in/yolovi)
+- **Melody Callejas Nuñez** [Linkedin](https://www.linkedin.com/in/melodycallejas)
+- **Jonathan Muñoz** [Linkedin](https://www.linkedin.com/in/jomuarribas/)
+- **Sebastian Barrientos** [Linkedin](https://www.linkedin.com/in/sebasbarrientos/)
 
 ### Backend:
-- **David Costa**
-- **Pablo Alonso Menendez**
-- **Nicolas Irigoyen**
-- **Luis Fernando García Barrero**
-- **Ángel Giraldo Silgado**
+- **David Costa** [Linkedin](https://www.linkedin.com/in/david-costa-yafar)
+- **Pablo Alonso Menendez**  [Linkedin](https://www.linkedin.com/in/pablo-alonsom/)
+- **Nicolas Irigoyen**  [Linkedin](https://www.linkedin.com/in/nirigoyen/)
+- **Luis Fernando García Barrero**  [Linkedin](https://www.linkedin.com/in/l-fernando-garcía-barrero/)
+- **Ángel Giraldo Silgado** 
 
 ### QA:
 - **Ana María Delgado Rodriguez**
 
 ### UX/UI:
-- **Ramón Montosa**
-- **Matías Villanueva**
+- **Ramón Montosa** [Linkedin](https://www.linkedin.com/in/ramon-montosa-palma/)
+- **Matías Villanueva** [Linkedin](https://www.linkedin.com/in/matias-villanueva/)  
 
 <br/>
 
