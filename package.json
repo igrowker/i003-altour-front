@@ -9,18 +9,33 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.1.8",
+    "@heroicons/react": "^2.1.5",
+    "@react-google-maps/api": "^2.19.3",
+    "axios": "^1.7.7",
+    "bcrypt": "^5.1.1",
+    "bootstrap-icons": "^1.11.3",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.451.0",
+    "next": "^14.2.7",
+    "next-auth": "^4.24.7",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.7"
+    "react-toastify": "^10.0.5",
+    "swiper": "^11.1.14",
+    "tailwind-scrollbar-hide": "^1.1.7",
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/bcrypt": "^5.0.2",
+    "@types/googlemaps": "^3.43.3",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.7",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.7"
+    "typescript": "^5"
   }
 }
